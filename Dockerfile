@@ -57,7 +57,7 @@ RUN mkdir -p /opt/go-wiki \
   && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 COPY docker-run.sh /
-COPY --from=builder /opt/go-wiki/src/github.com/chrootlogin/go-wiki/wiki /opt/go-wiki/wiki
+COPY --from=builder /opt/go-wiki/src/github.com/chrootlogin/go-wiki/go-wiki /opt/go-wiki/go-wiki
 
 EXPOSE 8080
 VOLUME /data

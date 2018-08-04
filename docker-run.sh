@@ -2,4 +2,4 @@
 
 cd /opt/go-wiki
 
-exec ./wiki
+exec ./go-wiki

@@ -1,36 +1,42 @@
 package page
 
 import (
+	"os"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/chrootlogin/go-wiki/src/repo"
-	"github.com/chrootlogin/go-wiki/src/common"
-	"os"
-
 	"gopkg.in/russross/blackfriday.v2"
 	"github.com/microcosm-cc/bluemonday"
-	)
 
-type ApiRequest struct {
+	"github.com/chrootlogin/go-wiki/src/repo"
+	"github.com/chrootlogin/go-wiki/src/common"
+)
+
+type apiRequest struct {
 	Title   string `json:"title,omitempty"`
 	Path	string `json:"path,omitempty"`
 	Content string `json:"page,omitempty"`
 }
 
 type apiResponse struct {
-	ContentType string `json:"contentType,omitempty"`
-	Content     string `json:"page,omitempty"`
+	Title 	string `json:"title,omitempty"`
+	Content string `json:"content,omitempty"`
 }
 
 // READ
 func GetPageHandler(c *gin.Context) {
 	contentPath := c.Param("page")
-	if contentPath != "" {
+	/*if contentPath != "" {
 		contentPath = trimLeftChar(contentPath)
-	}
+	}*/
 
-	if contentPath == "" {
+	if len(contentPath) > 0 {
+		lastChar := contentPath[len(contentPath)-1:]
+
+		if lastChar == "/" {
+			contentPath = "_default.json"
+		}
+	} else if contentPath == "" {
 		contentPath = "_default.json"
 	}
 
@@ -53,8 +59,10 @@ func GetPageHandler(c *gin.Context) {
 	unsafe := blackfriday.Run([]byte(file.Content))
 	html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
 
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	c.String(http.StatusOK, string(html))
+	c.JSON(http.StatusOK, apiResponse{
+		Title: file.Metadata["title"],
+		Content: string(html),
+	})
 }
 
 func trimLeftChar(s string) string {

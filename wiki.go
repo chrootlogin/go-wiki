@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
 	"net/http"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
-	"os"
+	"github.com/chrootlogin/go-wiki/src/frontend"
 )
 
 var port = "8000"
@@ -38,14 +39,11 @@ func initRouter() {
 
 	// public routes
 	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/webapp")
+		c.Redirect(http.StatusMovedPermanently, "/wiki")
 	})
 
 	router.GET("/api/page/*page", page.GetPageHandler)
-
-
-	// add webapp frontend
-	//router.Static("/webapp", "./frontend")
+	router.GET("/wiki/*path", frontend.GetFrontendHandler)
 
 	router.Run(":" + port)
 }

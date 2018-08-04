@@ -3,14 +3,16 @@ package repo
 import (
 	"os"
 	"log"
-	"path/filepath"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"time"
 	"io/ioutil"
-		"github.com/chrootlogin/go-wiki/src/common"
+	"path/filepath"
 	"encoding/json"
-	)
+
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
+
+	"github.com/chrootlogin/go-wiki/src/common"
+)
 
 var repositoryPath = ""
 var repo *git.Repository
