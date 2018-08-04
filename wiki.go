@@ -8,9 +8,16 @@ import (
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
+	"os"
 )
 
+var port = "8000"
+
 func main() {
+	if len(os.Getenv("PORT")) > 0 {
+		port = os.Getenv("PORT")
+	}
+
 	log.Println("Starting go-wiki.")
 	initRouter()
 	log.Println("go-wiki is running.")
@@ -39,5 +46,6 @@ func initRouter() {
 
 	// add webapp frontend
 	//router.Static("/webapp", "./frontend")
-	router.Run(":8000")
+
+	router.Run(":" + port)
 }

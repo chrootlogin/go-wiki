@@ -8,10 +8,9 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"time"
 	"io/ioutil"
-	"fmt"
-	"github.com/chrootlogin/go-wiki/src/common"
+		"github.com/chrootlogin/go-wiki/src/common"
 	"encoding/json"
-)
+	)
 
 var repositoryPath = ""
 var repo *git.Repository
@@ -37,21 +36,26 @@ func init() {
 func GetFile(path string) (*common.File, error) {
 	path = filepath.Join(repositoryPath, "pages", path)
 
+	// Open json file
 	jsonFile, err := os.Open(path)
-	fmt.Println(err)
 	if err != nil {
+		log.Println("open: " + err.Error())
 		return nil, err
 	}
 	defer jsonFile.Close()
 
+	// Read json file
 	data, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
+		log.Println("read file: " + err.Error())
 		return nil, err
 	}
 
-	var file *common.File
-	err = json.Unmarshal(data, &file)
+	// Convert json to object
+	var file = &common.File{}
+	err = json.Unmarshal(data, file)
 	if err != nil {
+		log.Println("unmarshal: " + err.Error())
 		return nil, err
 	}
 
