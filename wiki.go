@@ -11,6 +11,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/page"
 	"github.com/chrootlogin/go-wiki/src/frontend"
 	"github.com/chrootlogin/go-wiki/src/user"
+	"github.com/chrootlogin/go-wiki/src/auth"
 )
 
 var port = "8000"
@@ -35,20 +36,23 @@ func initRouter() {
 	corsConfig.AddAllowMethods("HEAD", "GET", "POST", "PUT", "DELETE")
 	router.Use(cors.New(corsConfig))
 
-	// load authentication
-	//am := auth.GetAuthMiddleware()
-
 	// public routes
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/wiki")
 	})
 	router.GET("/wiki/*path", frontend.GetFrontendHandler)
 
-	// login/registration
+	// authentication
+	am := auth.GetAuthMiddleware()
+	router.POST("/user/login", am.LoginHandler)
 	router.POST("/user/register", user.RegisterHandler)
 
 	// API
-	router.GET("/api/page/*page", page.GetPageHandler)
+	api := router.Group("/api/")
+	api.Use(am.MiddlewareFunc())
+	{
+		api.GET("/page/*page", page.GetPageHandler)
+	}
 
 	router.Run(":" + port)
 }

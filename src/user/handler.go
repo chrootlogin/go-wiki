@@ -22,7 +22,7 @@ func RegisterHandler(c *gin.Context) {
 	var data ApiRequest
 
 	if c.BindJSON(&data) == nil {
-		userList, err := GetUserList()
+		userList, err := auth.GetUserList()
 		if err != nil {
 			log.Println("Error loading users: " + err.Error())
 			c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
@@ -40,7 +40,7 @@ func RegisterHandler(c *gin.Context) {
 			return
 		}
 
-		user := User{
+		user := auth.User{
 			Username: data.Name,
 			Email: data.EMail,
 			PasswordHash: passwordHash,
@@ -60,7 +60,7 @@ func RegisterHandler(c *gin.Context) {
 	}
 }
 
-func validateNewUser(userList *UserList, name string, password string, email string) error {
+func validateNewUser(userList *auth.UserList, name string, password string, email string) error {
 	if len(name) <= 3 {
 		return errors.New("Username must be at least 3 chars.")
 	}
