@@ -14,6 +14,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/common"
 )
 
+const permissions = 0644
+
 var repositoryPath = ""
 var repo *git.Repository
 
@@ -62,6 +64,66 @@ func GetFile(path string) (*common.File, error) {
 	}
 
 	return file, nil
+}
+
+func GetRaw(path string) ([]byte, error) {
+	path = filepath.Join(repositoryPath, path)
+
+	// Open json file
+	file, err := os.Open(path)
+	if err != nil {
+		log.Println("open: " + err.Error())
+		return nil, err
+	}
+
+	// Read json file
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Println("read file: " + err.Error())
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func SaveRaw(path string, data []byte) error {
+	diskPath := filepath.Join(repositoryPath, path)
+
+	// Write file
+	err := ioutil.WriteFile(diskPath, data, permissions)
+	if err != nil {
+		log.Println("write file: " + err.Error())
+		return err
+	}
+
+	// Open worktree
+	wt, err := repo.Worktree()
+	if err != nil {
+		log.Println("worktree: " + err.Error())
+		return err
+	}
+
+	// Add file
+	_, err = wt.Add(path)
+	if err != nil {
+		log.Println("adding file: " + err.Error())
+		return err
+	}
+
+	// Creating initial commit
+	_, err = wt.Commit("Update file", &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Go Wiki",
+			Email: "go-wiki@example.org",
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		log.Println("commit: " + err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func initRepository() *git.Repository {

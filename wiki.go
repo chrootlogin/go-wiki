@@ -10,6 +10,7 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/page"
 	"github.com/chrootlogin/go-wiki/src/frontend"
+	"github.com/chrootlogin/go-wiki/src/user"
 )
 
 var port = "8000"
@@ -41,9 +42,13 @@ func initRouter() {
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/wiki")
 	})
-
-	router.GET("/api/page/*page", page.GetPageHandler)
 	router.GET("/wiki/*path", frontend.GetFrontendHandler)
+
+	// login/registration
+	router.POST("/user/register", user.RegisterHandler)
+
+	// API
+	router.GET("/api/page/*page", page.GetPageHandler)
 
 	router.Run(":" + port)
 }
