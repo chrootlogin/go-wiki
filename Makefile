@@ -10,7 +10,7 @@ dependencies:
 
 go_app:
 	$(GOBINDATA) -pkg frontend -prefix frontend/dist/ -o src/frontend/frontend.go frontend/dist/
-	$(GOBINDATA) -pkg repo -prefix default/ -o src/repo/default.go default/pages/ default/prefs
+	$(GOBINDATA) -pkg repo -prefix default/ -o src/repo/default.go default/pages/ default/prefs/
 	$(GOLANG) build -o go-wiki wiki.go
 
 web_app:
