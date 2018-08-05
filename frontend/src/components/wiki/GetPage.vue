@@ -22,20 +22,20 @@
                                 </router-link>
                             </li>
                             <li>
+                                <a v-on:click="createPage">
+                                    <span>Create page</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-plus"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
                                 <a v-on:click="deletePage">
                                     <span>Delete page</span>
                                     <span class="icon is-small">
                                         <i class="fa fa-times"></i>
                                     </span>
                                 </a>
-                            </li>
-                            <li>
-                                <router-link :to="{ name: 'edit', query: { path: url } }">
-                                    <span>Create page</span>
-                                    <span class="icon is-small">
-                                        <i class="fa fa-plus"></i>
-                                    </span>
-                                </router-link>
                             </li>
                         </ul>
                     </aside>
@@ -110,6 +110,23 @@
                     params: {
                         spaceKey: this.spaceKey,
                         pageSlug: homepage
+                    }
+                })
+            },
+            createPage() {
+                this.$dialog.prompt({
+                    message: `URL of the new page?`,
+                    inputAttrs: {
+                        placeholder: 'e.g. my_page/',
+                        maxlength: 255
+                    },
+                    onConfirm: (value) => {
+                        this.$router.push({
+                            name: "edit",
+                            query: {
+                                path: this.url + value
+                            }
+                        })
                     }
                 })
             },

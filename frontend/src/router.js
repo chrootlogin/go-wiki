@@ -25,7 +25,6 @@ const routes = [
         name: 'edit',
         path: '/edit',
         component: WikiComponents.CreateEditPage,
-        props: true,
     },
     {
         name: 'page',

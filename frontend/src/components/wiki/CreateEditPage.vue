@@ -12,6 +12,11 @@
         <div class="container">
             <b-tabs type="is-boxed" v-on:change="editorTabChanged" v-model="activeEditorTab">
                 <b-tab-item label="Editor">
+                    <div v-if="createMode">
+                        <b-field label="Path">
+                            <b-input v-model="path"></b-input>
+                        </b-field>
+                    </div>
                     <markdown-editor v-model="page.content" ref="markdownEditor"></markdown-editor>
                 </b-tab-item>
                 <b-tab-item label="Preview">
@@ -50,6 +55,7 @@
         },
         data() {
             return {
+                createMode: false,
                 loading: false,
                 error: 0,
                 page: {
@@ -77,9 +83,23 @@
                 this.$http.get(this.$store.state.backendURL + '/api/page/' + this.path + '?format=no-render').then(
                 res => {
                     this.error = 0;
+                    this.createMode = false;
+
                     this.page = res.body;
                 }, res => {
-                    this.error = res.status;
+                    if(res.status === 404) {
+                        // remove error
+                        this.$store.commit('setNotification', {notification: {}});
+
+                        // switch to create mode
+                        this.createMode = true;
+                        this.error = 0;
+                        this.page = {
+                            content: "# Empty page"
+                        }
+                    } else {
+                        this.error = res.status;
+                    }
                 });
             },
             loadAsyncPreviewData: function() {
@@ -105,7 +125,11 @@
                 })
             },
             cancel() {
-                this.redirectToPage(this.path);
+                if(this.createMode) {
+                    this.redirectToPage("");
+                } else {
+                    this.redirectToPage(this.path);
+                }
             },
             save() {
                 this.loading = true;
