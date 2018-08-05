@@ -17,6 +17,11 @@
                 <b-tab-item label="Preview">
                     <div class="content" v-html="preview"></div>
                 </b-tab-item>
+                <b-tab-item label="Settings">
+                    <b-field label="Path">
+                        <b-input v-model="path" disabled></b-input>
+                    </b-field>
+                </b-tab-item>
             </b-tabs>
             <p class="has-text-right">
                 <button v-on:click="cancel" class="button is-danger">
