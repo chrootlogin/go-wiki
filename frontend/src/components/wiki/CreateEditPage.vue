@@ -28,12 +28,10 @@
 </template>
 
 <script>
-    import { VueEditor } from 'vue2-editor'
     import markdownEditor from 'vue-simplemde/src/markdown-editor.vue'
 
     export default {
         components: {
-            VueEditor,
             markdownEditor
         },
         data() {

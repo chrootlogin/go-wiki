@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/common"
+	"time"
 )
 
 func GetFrontendHandler(c *gin.Context) {
@@ -32,8 +33,18 @@ func GetFrontendHandler(c *gin.Context) {
 
 	switch filepath.Ext(path) {
 		case ".js":
+			// allow caching
+			t := time.Now().AddDate(0,0,365)
+			c.Header("Expires", t.Format(time.RFC1123))
+			c.Header("Cache-Control", "public, max-age=31536000")
+
 			c.Header("Content-Type", "text/javascript")
 		case ".html":
+			// disallow caching
+			t := time.Now().AddDate(0,0,-30)
+			c.Header("Expires", t.Format(time.RFC1123))
+			c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+
 			c.Header("Content-Type", "text/html")
 	}
 
