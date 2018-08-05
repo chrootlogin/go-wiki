@@ -1,6 +1,6 @@
 {
-  "content-type": "text/markdown",
-  "content": "# A warm welcome\n\nThis is your first wiki page. You can edit or delete it.",
+  "content-type": "text/html",
+  "content": "<h1>A warm welcome</h1><p>This is your first wiki page. You can edit or delete it.</p>",
   "metadata": {
     "title": "Welcome"
   }

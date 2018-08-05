@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gopkg.in/russross/blackfriday.v2"
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/chrootlogin/go-wiki/src/repo"
@@ -51,18 +50,19 @@ func GetPageHandler(c *gin.Context) {
 		return
 	}
 
-	if file.ContentType != "text/markdown" {
-		c.JSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Content-type is not allowed here" })
+	if file.ContentType == "text/html" {
+		html := bluemonday.UGCPolicy().SanitizeBytes([]byte(file.Content))
+
+		c.JSON(http.StatusOK, apiResponse{
+			Title: file.Metadata["title"],
+			Content: string(html),
+		})
+
 		return
 	}
 
-	unsafe := blackfriday.Run([]byte(file.Content))
-	html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
-
-	c.JSON(http.StatusOK, apiResponse{
-		Title: file.Metadata["title"],
-		Content: string(html),
-	})
+	c.JSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Content-type is not allowed here" })
+	return
 }
 
 func trimLeftChar(s string) string {

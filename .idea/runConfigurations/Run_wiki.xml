@@ -3,6 +3,9 @@
     <module name="go-wiki" />
     <working_directory value="$PROJECT_DIR$" />
     <go_parameters value="-i" />
+    <envs>
+      <env name="SESSION_KEY" value="not-a-secure-key" />
+    </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/wiki.go" />
     <package value="github.com/chrootlogin/go-wiki" />
