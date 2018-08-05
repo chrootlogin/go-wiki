@@ -134,24 +134,47 @@
             save() {
                 this.loading = true;
 
-                this.$http.put(
-                    this.$store.state.backendURL + '/api/page/' + this.path,
-                    this.page
-                ).then(
-                    () => {
-                        this.loading = false;
+                if(this.createMode) {
+                    this.$http.post(
+                        this.$store.state.backendURL + '/api/page/' + this.path,
+                        this.page
+                    ).then(
+                        () => {
+                            this.loading = false;
 
-                        this.$toast.open({
-                            type: 'is-success',
-                            message: 'Page updated!'
-                        });
+                            this.$toast.open({
+                                type: 'is-success',
+                                message: 'Page created!'
+                            });
 
-                        this.redirectToPage(this.path);
-                    }, res => {
-                        this.loading = false;
+                            this.redirectToPage(this.path);
+                        }, res => {
+                            this.loading = false;
 
-                        this.error = res.status;
-                    });
+                            this.error = res.status;
+                        }
+                    );
+                } else {
+                    this.$http.put(
+                        this.$store.state.backendURL + '/api/page/' + this.path,
+                        this.page
+                    ).then(
+                        () => {
+                            this.loading = false;
+
+                            this.$toast.open({
+                                type: 'is-success',
+                                message: 'Page updated!'
+                            });
+
+                            this.redirectToPage(this.path);
+                        }, res => {
+                            this.loading = false;
+
+                            this.error = res.status;
+                        }
+                    );
+                }
             },
             editorTabChanged(index) {
                 if(index === 1) {

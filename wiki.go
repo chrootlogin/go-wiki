@@ -52,6 +52,7 @@ func initRouter() {
 	api.Use(am.MiddlewareFunc())
 	{
 		api.GET("/page/*path", page.GetPageHandler)
+		api.POST("/page/*path", page.PostPageHandler)
 		api.PUT("/page/*path", page.PutPageHandler)
 
 		api.POST("/preview", page.PostPreviewHandler)

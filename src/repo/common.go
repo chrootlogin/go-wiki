@@ -36,6 +36,22 @@ func init() {
 	repo = initRepository()
 }
 
+func HasRaw(path string) bool {
+	path = filepath.Join(repositoryPath, path)
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
+func HasFile(path string) bool {
+	path = filepath.Join("pages", path)
+
+	return HasRaw(path)
+}
+
 func GetRaw(path string) ([]byte, error) {
 	path = filepath.Join(repositoryPath, path)
 
@@ -125,6 +141,12 @@ func SaveFile(path string, file *common.File) error {
 	}
 
 	return SaveRaw(path, jsonBytes)
+}
+
+func MkdirPage(path string) error {
+	path = filepath.Join(repositoryPath, "pages", path)
+
+	return os.MkdirAll(path, os.ModePerm);
 }
 
 func initRepository() *git.Repository {

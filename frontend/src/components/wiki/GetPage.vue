@@ -124,7 +124,7 @@
                         this.$router.push({
                             name: "edit",
                             query: {
-                                path: this.url + value
+                                path: value
                             }
                         })
                     }
@@ -147,6 +147,7 @@
             }
         },
         mounted: function() {
+            console.log(this.url)
             this.loadAsyncPageData();
         },
         watch: {
