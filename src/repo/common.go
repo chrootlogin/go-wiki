@@ -6,12 +6,11 @@ import (
 	"time"
 	"io/ioutil"
 	"path/filepath"
-	"encoding/json"
-
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/chrootlogin/go-wiki/src/common"
+	"encoding/json"
 )
 
 const permissions = 0644
@@ -37,35 +36,6 @@ func init() {
 	repo = initRepository()
 }
 
-func GetFile(path string) (*common.File, error) {
-	path = filepath.Join(repositoryPath, "pages", path)
-
-	// Open json file
-	jsonFile, err := os.Open(path)
-	if err != nil {
-		log.Println("open: " + err.Error())
-		return nil, err
-	}
-	defer jsonFile.Close()
-
-	// Read json file
-	data, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		log.Println("read file: " + err.Error())
-		return nil, err
-	}
-
-	// Convert json to object
-	var file = &common.File{}
-	err = json.Unmarshal(data, file)
-	if err != nil {
-		log.Println("unmarshal: " + err.Error())
-		return nil, err
-	}
-
-	return file, nil
-}
-
 func GetRaw(path string) ([]byte, error) {
 	path = filepath.Join(repositoryPath, path)
 
@@ -84,6 +54,25 @@ func GetRaw(path string) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func GetFile(path string) (*common.File, error) {
+	path = filepath.Join("pages", path)
+
+	data, err := GetRaw(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert json to object
+	var file = &common.File{}
+	err = json.Unmarshal(data, file)
+	if err != nil {
+		log.Println("unmarshal: " + err.Error())
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func SaveRaw(path string, data []byte) error {
@@ -124,6 +113,18 @@ func SaveRaw(path string, data []byte) error {
 	}
 
 	return nil
+}
+
+func SaveFile(path string, file *common.File) error {
+	path = filepath.Join("pages", path)
+
+	jsonBytes, err := json.Marshal(file)
+	if err != nil {
+		log.Println("marshal: " + err.Error())
+		return err
+	}
+
+	return SaveRaw(path, jsonBytes)
 }
 
 func initRepository() *git.Repository {

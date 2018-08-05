@@ -19,13 +19,13 @@
                 </b-tab-item>
             </b-tabs>
             <p class="has-text-right">
-                <button v-on:click="cancelEdit" class="button is-danger">
+                <button v-on:click="cancel" class="button is-danger">
                     <span>Cancel</span>
                     <span class="icon is-small">
                         <i class="fa fa-times"></i>
                     </span>
                 </button>
-                <button v-on:click="saveEdit" class="button is-primary" v-bind:class="{'is-loading': loading}">
+                <button v-on:click="save" class="button is-primary" v-bind:class="{'is-loading': loading}">
                     <span>Save page</span>
                     <span class="icon is-small">
                         <i class="fa fa-save"></i>
@@ -99,30 +99,25 @@
                     }
                 })
             },
-            enableEdit() {
-                this.pageForm = JSON.parse(JSON.stringify(this.page));
-                this.edit = true;
-            },
-            cancelEdit() {
+            cancel() {
                 this.redirectToPage(this.path);
             },
-            saveEdit() {
+            save() {
                 this.loading = true;
 
                 this.$http.put(
-                    this.$store.state.backendURL + '/api/wiki/' + this.spaceKey + '/' + this.pageSlug,
-                    this.pageForm
+                    this.$store.state.backendURL + '/api/page/' + this.path,
+                    this.page
                 ).then(
                     () => {
                         this.loading = false;
-                        this.edit = false;
 
                         this.$toast.open({
                             type: 'is-success',
                             message: 'Page updated!'
                         });
 
-                        this.loadAsyncPageData();
+                        this.redirectToPage(this.path);
                     }, res => {
                         this.loading = false;
 
