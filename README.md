@@ -14,10 +14,20 @@ $ docker run -p 80:8000 -e SESSION_KEY=AVerySecureString rootlogin/go-wiki
 ### Environment variables
 
 * **SESSION_KEY**: Sets the session key for the auth cookie encryption. ***(required)***
+* **REPOSITORY_PATH**: Sets the data repository path (default: $PWD/data).
+
+### Default login
+
+The following user is available on a new go-wiki installation:
+
+* **Username:** admin
+* **Password:** admin1234
+ 
+**Please change this credentials on your first login or delete the user!**
 
 ## Development
 
-To work on agw, you need to have Golang and NodeJS installed.
+To work on go-wiki, you need to have Golang and NodeJS installed.
 
 ### Dependencies
  * [NodeJS](https://nodejs.org) 8.x and NPM
@@ -29,7 +39,7 @@ To work on agw, you need to have Golang and NodeJS installed.
 ```bash
 # Run backend
 dep ensure
-go run main.go
+go run wiki.go
 
 # Run frontend
 cd /frontend

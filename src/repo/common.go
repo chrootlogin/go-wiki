@@ -29,7 +29,7 @@ func init() {
 		}
 
 		repositoryPath = filepath.Join(dir, "data")
-		log.Println("Environment variable REPOSITORY is empty. Using: " + repositoryPath)
+		log.Println("Environment variable REPOSITORY_PATH is empty. Using: " + repositoryPath)
 	} else {
 		log.Println("Using repository path: " + repositoryPath)
 	}
