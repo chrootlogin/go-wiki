@@ -1,5 +1,14 @@
 <template >
     <div v-if="error === 0">
+        <section class="hero is-primary">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        Editor
+                    </h1>
+                </div>
+            </div>
+        </section>
         <div class="container">
             <b-tabs type="is-boxed" v-on:change="editorTabChanged" v-model="activeEditorTab">
                 <b-tab-item label="Editor">
