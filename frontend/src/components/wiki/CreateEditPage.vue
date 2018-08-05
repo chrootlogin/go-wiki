@@ -56,17 +56,7 @@
             }
         },
         computed: {
-            url() {
-                let url = this.pageSlug;
-                if(url == null) {
-                    url = "";
-                }
-
-                return url;
-            }
-        },
-        methods: {
-            loadAsyncPageData: function() {
+            path() {
                 let path = this.$route.query.path;
 
                 // fix url if needed...
@@ -74,7 +64,12 @@
                     path = "";
                 }
 
-                this.$http.get(this.$store.state.backendURL + '/api/page/' + path + '?format=no-render').then(
+                return path;
+            }
+        },
+        methods: {
+            loadAsyncPageData: function() {
+                this.$http.get(this.$store.state.backendURL + '/api/page/' + this.path + '?format=no-render').then(
                 res => {
                     this.error = 0;
                     this.page = res.body;
@@ -109,8 +104,7 @@
                 this.edit = true;
             },
             cancelEdit() {
-                this.pageForm = {};
-                this.edit = false;
+                this.redirectToPage(this.path);
             },
             saveEdit() {
                 this.loading = true;
