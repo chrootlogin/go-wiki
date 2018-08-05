@@ -8,6 +8,7 @@ import Login from './components/shared/Login.vue';
 import Notification from './components/shared/Notification.vue';
 import Profile from './components/shared/Profile.vue'
 import GetPage from './components/wiki/GetPage.vue'
+import CreateEditPage from './components/wiki/CreateEditPage.vue'
 
 Vue.component('login', Login);
 Vue.component('navbar', Nav);
@@ -25,7 +26,8 @@ export const LocalComponents = {
 };
 
 export const WikiComponents = {
-    GetPage
+    GetPage,
+    CreateEditPage
 };
 
 

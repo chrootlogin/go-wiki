@@ -51,7 +51,9 @@ func initRouter() {
 	api := router.Group("/api/")
 	api.Use(am.MiddlewareFunc())
 	{
-		api.GET("/page/*page", page.GetPageHandler)
+		api.GET("/page/*path", page.GetPageHandler)
+
+		api.POST("/preview", page.PostPreviewHandler)
 	}
 
 	router.Run(":" + port)
