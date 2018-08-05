@@ -1,36 +1,51 @@
-<template >
-    <div v-if="error === 0">
-        <article>
+<template>
+    <section class="section" v-if="error === 0">
+        <div class="container">
             <div class="notification">
-                <div class="container has-text-right">
-                    <nav class="breadcrump is-pulled-left is-hidden-mobile" aria-label="breadcrumbs">
-                        <ul v-html="breadcrumb"></ul>
-                    </nav>
-                    <button class="button is-success">
-                        <span>Create page</span>
-                        <span class="icon is-small">
-                            <i class="fa fa-plus"></i>
-                        </span>
-                    </button>
-                    <router-link :to="{ name: 'edit', query: { path: url } }" class="button is-primary">
-                        <span>Edit page</span>
-                        <span class="icon is-small">
-                            <i class="fa fa-edit"></i>
-                        </span>
-                    </router-link>
-                    <button v-on:click="deletePage" class="button is-danger is-outlined">
-                        <span>Delete page</span>
-                        <span class="icon is-small">
-                            <i class="fa fa-times"></i>
-                        </span>
-                    </button>
+                <nav class="breadcrump is-hidden-mobile" aria-label="breadcrumbs">
+                    <ul v-html="breadcrumb"></ul>
+                </nav>
+            </div>
+            <div class="columns">
+                <div class="column is-one-fifth">
+                    <aside class="menu">
+                        <p class="menu-label">
+                            Page Administration
+                        </p>
+                        <ul class="menu-list">
+                            <li>
+                                <router-link :to="{ name: 'edit', query: { path: url } }">
+                                    <span>Edit page</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-edit"></i>
+                                    </span>
+                                </router-link>
+                            </li>
+                            <li>
+                                <a v-on:click="deletePage">
+                                    <span>Delete page</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-times"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <router-link :to="{ name: 'edit', query: { path: url } }">
+                                    <span>Create page</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-plus"></i>
+                                    </span>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </aside>
+                </div>
+                <div class="column">
+                    <article class="content" v-html="page.content"></article>
                 </div>
             </div>
-            <div class="container" v-if="!edit">
-                <div class="content" v-html="page.content"></div>
-            </div>
-        </article>
-    </div>
+        </div>
+    </section>
 </template>
 
 <script>
