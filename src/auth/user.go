@@ -5,7 +5,7 @@ import (
 	"log"
 	"encoding/json"
 	"errors"
-)
+		)
 
 type UserList struct {
 	Users map[string]User
@@ -34,7 +34,7 @@ func (u *UserList) Add(user User) error {
 		return err
 	}
 
-	err = repo.SaveRaw("prefs/_users.json", jsonData)
+	err = repo.SaveRaw("prefs/_users.json", jsonData, repo.Commit{})
 	if err != nil {
 		log.Println("save file: " + err.Error())
 		return err
@@ -62,4 +62,17 @@ func GetUserList() (*UserList, error) {
 	}
 
 	return userList, nil
+}
+
+func GetUserById(userId string) (User, error) {
+	ul, err := GetUserList()
+	if err != nil {
+		return User{}, err
+	}
+	u, err := ul.Get(userId)
+	if err != nil {
+		return User{}, err
+	}
+
+	return u, err
 }

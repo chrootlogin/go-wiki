@@ -11,12 +11,18 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/common"
 	"encoding/json"
+	"github.com/chrootlogin/go-wiki/src/auth"
 )
 
 const permissions = 0644
 
 var repositoryPath = ""
 var repo *git.Repository
+
+type Commit struct {
+	Message string
+	Author auth.User
+}
 
 func init() {
 	repositoryPath = os.Getenv("REPOSITORY_PATH")
@@ -91,7 +97,7 @@ func GetFile(path string) (*common.File, error) {
 	return file, nil
 }
 
-func SaveRaw(path string, data []byte) error {
+func SaveRaw(path string, data []byte, commitOptions Commit) error {
 	diskPath := filepath.Join(repositoryPath, path)
 
 	// Write file
@@ -131,7 +137,7 @@ func SaveRaw(path string, data []byte) error {
 	return nil
 }
 
-func SaveFile(path string, file *common.File) error {
+func SaveFile(path string, file *common.File, commit Commit) error {
 	path = filepath.Join("pages", path)
 
 	jsonBytes, err := json.Marshal(file)
@@ -140,7 +146,7 @@ func SaveFile(path string, file *common.File) error {
 		return err
 	}
 
-	return SaveRaw(path, jsonBytes)
+	return SaveRaw(path, jsonBytes, commit)
 }
 
 func MkdirPage(path string) error {

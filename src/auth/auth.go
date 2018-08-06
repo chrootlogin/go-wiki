@@ -79,6 +79,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 				return
 			}
 
+			// check if user exits
 			user, err = userList.Get(userId)
 			if err != nil {
 				c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)

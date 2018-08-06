@@ -12,6 +12,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/common"
 	"path/filepath"
 	"fmt"
+	"github.com/chrootlogin/go-wiki/src/auth"
+	"github.com/chrootlogin/go-wiki/src/helper"
 )
 
 type apiRequest struct {
@@ -99,25 +101,28 @@ func PutPageHandler(c *gin.Context) {
 }
 
 func PostPageHandler(c *gin.Context) {
-	path := normalizePath(c.Param("path"))
+	// Get user
 
+	user, exists := c.Get("user")
+	if !exists {
+		helper.Unauthorized(c)
+		return
+	}
+	u := user.(auth.User)
+
+	// Get path
+	path := normalizePath(c.Param("path"))
 	if repo.HasFile(path) {
-		c.JSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Page already exists, use PUT to edit." })
+		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Page already exists, use PUT to edit." })
 		return
 	}
 
 	var data apiRequest
 	if c.BindJSON(&data) == nil {
-
-		dir, filename := filepath.Split(path)
-
-		fmt.Println(dir)
-		fmt.Println(filename)
-		fmt.Println(path)
-
+		dir, _ := filepath.Split(path)
 		err := repo.MkdirPage(dir)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
 		}
 
@@ -126,9 +131,12 @@ func PostPageHandler(c *gin.Context) {
 			Content: data.Content,
 		}
 
-		err = repo.SaveFile(path, file)
+		err = repo.SaveFile(path, file, repo.Commit{
+			Author: u,
+			Message: "created new page: " + path,
+		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
 		}
 
@@ -136,7 +144,7 @@ func PostPageHandler(c *gin.Context) {
 			Message: "Created page.",
 		})
 	} else {
-		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
+		c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
 }
 
