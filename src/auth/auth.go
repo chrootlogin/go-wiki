@@ -35,7 +35,7 @@ func GetAuthMiddleware() *AuthMiddleware {
 	}
 
 	return &AuthMiddleware {
-		Realm: "agw",
+		Realm: "gowiki",
 		Key: []byte(signingKey),
 		SigningAlgorithm: jwt.SigningMethodHS512,
 		Timeout: time.Hour * 24,
