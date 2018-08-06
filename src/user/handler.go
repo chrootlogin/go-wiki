@@ -40,7 +40,7 @@ func RegisterHandler(c *gin.Context) {
 			return
 		}
 
-		user := auth.User{
+		user := common.User{
 			Username: data.Name,
 			Email: data.EMail,
 			PasswordHash: passwordHash,

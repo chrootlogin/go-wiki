@@ -5,27 +5,28 @@ import (
 	"log"
 	"encoding/json"
 	"errors"
-		)
+	"github.com/chrootlogin/go-wiki/src/common"
+)
 
 type UserList struct {
-	Users map[string]User
+	Users map[string]common.User
 }
 
-func (u *UserList) GetAll() map[string]User {
+func (u *UserList) GetAll() map[string]common.User {
 	return u.Users
 }
 
-func (u *UserList) Get(username string) (User, error) {
+func (u *UserList) Get(username string) (common.User, error) {
 	value, ok := u.Users[username]
 	if ok {
 		value.Username = username
 		return value, nil
 	} else {
-		return User{}, errors.New("User not found: " + username)
+		return common.User{}, errors.New("User not found: " + username)
 	}
 }
 
-func (u *UserList) Add(user User) error {
+func (u *UserList) Add(user common.User) error {
 	u.Users[user.Username] = user
 
 	jsonData, err := json.Marshal(u.Users)
@@ -50,7 +51,7 @@ func GetUserList() (*UserList, error) {
 	}
 
 	// Convert json to object
-	var users map[string]User
+	var users map[string]common.User
 	err = json.Unmarshal(usersRaw, &users)
 	if err != nil {
 		log.Println("unmarshal: " + err.Error())
@@ -64,14 +65,14 @@ func GetUserList() (*UserList, error) {
 	return userList, nil
 }
 
-func GetUserById(userId string) (User, error) {
+func GetUserById(userId string) (common.User, error) {
 	ul, err := GetUserList()
 	if err != nil {
-		return User{}, err
+		return common.User{}, err
 	}
 	u, err := ul.Get(userId)
 	if err != nil {
-		return User{}, err
+		return common.User{}, err
 	}
 
 	return u, err

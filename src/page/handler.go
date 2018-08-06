@@ -12,7 +12,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/common"
 	"path/filepath"
 	"fmt"
-	"github.com/chrootlogin/go-wiki/src/auth"
+
 	"github.com/chrootlogin/go-wiki/src/helper"
 )
 
@@ -65,6 +65,12 @@ func GetPageHandler(c *gin.Context) {
 }
 
 func PutPageHandler(c *gin.Context) {
+	user, exists := common.GetClientUser(c)
+	if !exists {
+		helper.Unauthorized(c)
+		return
+	}
+
 	path := normalizePath(c.Param("path"))
 
 	_, err := repo.GetFile(path)
@@ -79,16 +85,18 @@ func PutPageHandler(c *gin.Context) {
 	}
 
 	var data apiRequest
-
 	if c.BindJSON(&data) == nil {
 		var file = &common.File{
 			ContentType: "text/markdown",
 			Content: data.Content,
 		}
 
-		err = repo.SaveFile(path, file)
+		err = repo.SaveFile(path, file, repo.Commit{
+			Author: user,
+			Message: "Updated page: " + path,
+		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
 		}
 
@@ -102,13 +110,11 @@ func PutPageHandler(c *gin.Context) {
 
 func PostPageHandler(c *gin.Context) {
 	// Get user
-
-	user, exists := c.Get("user")
+	user, exists := common.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return
 	}
-	u := user.(auth.User)
 
 	// Get path
 	path := normalizePath(c.Param("path"))
@@ -132,8 +138,8 @@ func PostPageHandler(c *gin.Context) {
 		}
 
 		err = repo.SaveFile(path, file, repo.Commit{
-			Author: u,
-			Message: "created new page: " + path,
+			Author: user,
+			Message: "Created new page: " + path,
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })

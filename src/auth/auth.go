@@ -45,7 +45,7 @@ func GetAuthMiddleware() *AuthMiddleware {
 func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		loggedIn := false
-		user := User{}
+		user := common.User{}
 
 		// Get token from the Authorization header if available
 		// format: Authorization: Bearer <token>

@@ -11,18 +11,12 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/common"
 	"encoding/json"
-	"github.com/chrootlogin/go-wiki/src/auth"
 )
 
 const permissions = 0644
 
 var repositoryPath = ""
 var repo *git.Repository
-
-type Commit struct {
-	Message string
-	Author auth.User
-}
 
 func init() {
 	repositoryPath = os.Getenv("REPOSITORY_PATH")
@@ -97,7 +91,7 @@ func GetFile(path string) (*common.File, error) {
 	return file, nil
 }
 
-func SaveRaw(path string, data []byte, commitOptions Commit) error {
+func SaveRaw(path string, data []byte, commit Commit) error {
 	diskPath := filepath.Join(repositoryPath, path)
 
 	// Write file
@@ -122,10 +116,10 @@ func SaveRaw(path string, data []byte, commitOptions Commit) error {
 	}
 
 	// Creating initial commit
-	_, err = wt.Commit("Update file", &git.CommitOptions{
+	_, err = wt.Commit(commit.Message, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Go Wiki",
-			Email: "go-wiki@example.org",
+			Name:  commit.Author.Username,
+			Email: commit.Author.Email,
 			When:  time.Now(),
 		},
 	})
