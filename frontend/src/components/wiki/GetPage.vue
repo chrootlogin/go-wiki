@@ -2,7 +2,7 @@
     <section class="section" v-if="error === 0">
         <div class="container">
             <div class="notification">
-                <nav class="breadcrump is-hidden-mobile" aria-label="breadcrumbs">
+                <nav class="breadcrumb is-hidden-mobile" aria-label="breadcrumbs">
                     <ul v-html="breadcrumb"></ul>
                 </nav>
             </div>
@@ -91,15 +91,28 @@
                 });
             },
             renderBreadcrumb: function() {
-                var pageSlug = this.PageSlug;
-                if(pageSlug != null) {
-                    pageSlug = pageSlug.split("/");
-                } else {
+                let pageSlug = this.url;
+                let htmlList = [];
+
+                if(pageSlug == null || pageSlug === "") {
                     pageSlug = [];
+                    htmlList.push("<li class='is-active'><a href='#/wiki'><i class='fa fa-home'></i></a></li>");
+                } else {
+                    pageSlug = pageSlug.split("/");
+                    htmlList.push("<li><a href='#/wiki'><i class='fa fa-home'></i></a></li>");
                 }
 
-                var htmlList = [];
-                htmlList.push("<li><a><i class='fa fa-home'></i></a></li>");
+                let lastElement = htmlList.length;
+                let fullUrl = "#/wiki/";
+                pageSlug.forEach((slug, index) => {
+                    fullUrl += slug + "/";
+
+                    if(index < lastElement) {
+                        htmlList.push(`<li><a href="${fullUrl}">${slug}</a></li>`);
+                    } else {
+                        htmlList.push(`<li class="is-active"><a href="${fullUrl}">${slug}</a></li>`);
+                    }
+                });
 
                 // set breadcrumb
                 this.breadcrumb = htmlList.join("");
@@ -147,7 +160,6 @@
             }
         },
         mounted: function() {
-            console.log(this.url)
             this.loadAsyncPageData();
         },
         watch: {
