@@ -155,7 +155,10 @@ func PostPreviewHandler(c *gin.Context) {
 
 func renderPage(html string) string {
 	// Render Markdown
-	output := blackfriday.Run([]byte(html))
+	output := blackfriday.Run([]byte(html), blackfriday.WithRenderer(
+		blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
+			AbsolutePrefix: "#/wiki",
+		})))
 
 	// Sanitize HTML
 	output = bluemonday.UGCPolicy().SanitizeBytes(output)

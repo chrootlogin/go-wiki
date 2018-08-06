@@ -28,7 +28,7 @@ const routes = [
     },
     {
         name: 'page',
-        path: '/wiki/:pageSlug?',
+        path: '/wiki/:pageSlug*',
         component: WikiComponents.GetPage,
         props: true,
     }
