@@ -1,13 +1,13 @@
 package frontend
 
 import (
+	"time"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/common"
-	"time"
 )
 
 func GetFrontendHandler(c *gin.Context) {

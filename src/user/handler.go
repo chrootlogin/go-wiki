@@ -1,15 +1,17 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"github.com/chrootlogin/go-wiki/src/common"
+	"log"
 	"fmt"
 	"errors"
 	"regexp"
+	"net/http"
+
 	"github.com/badoux/checkmail"
+	"github.com/gin-gonic/gin"
+
+	"github.com/chrootlogin/go-wiki/src/common"
 	"github.com/chrootlogin/go-wiki/src/auth"
-	"log"
 )
 
 type ApiRequest struct {

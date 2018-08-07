@@ -4,11 +4,11 @@ import (
 	"os"
 	"log"
 	"time"
-		"path/filepath"
+	"path/filepath"
+
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
-
-		)
+)
 
 const permissions = 0644
 

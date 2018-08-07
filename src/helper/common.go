@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/common"
-	)
+)
 
 func Unauthorized(c *gin.Context) {
 	c.Header("WWW-Authenticate", "JWT realm=gowiki")

@@ -1,10 +1,11 @@
 package auth
 
 import (
-	"github.com/chrootlogin/go-wiki/src/repo"
 	"log"
-	"encoding/json"
 	"errors"
+	"encoding/json"
+
+	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
 )
 

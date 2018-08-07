@@ -1,7 +1,9 @@
 package page
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,9 +12,6 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
-	"path/filepath"
-	"fmt"
-
 	"github.com/chrootlogin/go-wiki/src/helper"
 )
 
