@@ -96,7 +96,7 @@
 
                 if(pageSlug == null || pageSlug === "") {
                     pageSlug = [];
-                    htmlList.push("<li class='is-active'><a href='#/wiki'><i class='fa fa-home'></i></a></li>");
+                    htmlList.push("<li class='is-active'><a href='#/wiki'><i class='fa fa-home'></i> Home</a></li>");
                 } else {
                     pageSlug = pageSlug.split("/");
                     htmlList.push("<li><a href='#/wiki'><i class='fa fa-home'></i></a></li>");

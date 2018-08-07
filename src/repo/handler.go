@@ -10,6 +10,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"time"
+	"fmt"
 )
 
 func HasRaw(path string) bool {
@@ -51,6 +52,10 @@ func GetRaw(path string) ([]byte, error) {
 func GetFile(path string) (*common.File, error) {
 	path = filepath.Join("pages", path)
 
+	commits := getCommitHistoryOfFile(path)
+	fmt.Println(commits)
+
+
 	data, err := GetRaw(path)
 	if err != nil {
 		return nil, err
@@ -91,7 +96,7 @@ func SaveRaw(path string, data []byte, commit Commit) error {
 		return err
 	}
 
-	// Creating initial commit
+	// Creating commit
 	_, err = wt.Commit(commit.Message, &git.CommitOptions{
 		Author: &object.Signature{
 			Name:  commit.Author.Username,
@@ -123,4 +128,21 @@ func MkdirPage(path string) error {
 	path = filepath.Join(repositoryPath, "pages", path)
 
 	return os.MkdirAll(path, os.ModePerm);
+}
+
+func getCommitHistoryOfFile(path string) []*object.Commit {
+	objects := []*object.Commit{}
+
+	ref, err := repo.Head()
+	if err == nil {
+		cIter, err := repo.Log(&git.LogOptions{From: ref.Hash()})
+		if err == nil {
+			cIter.ForEach(filterByChangesToPath(repo, path, func(c *object.Commit) error {
+				objects = append(objects, c)
+				return nil
+			}))
+		}
+	}
+
+	return objects
 }
