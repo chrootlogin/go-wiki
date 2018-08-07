@@ -55,7 +55,6 @@ func GetFile(path string) (*common.File, error) {
 	commits := getCommitHistoryOfFile(path)
 	fmt.Println(commits)
 
-
 	data, err := GetRaw(path)
 	if err != nil {
 		return nil, err
