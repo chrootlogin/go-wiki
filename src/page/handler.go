@@ -1,11 +1,11 @@
 package page
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 	"net/http"
+	"path/filepath"
 
+	"github.com/imdario/mergo"
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
@@ -72,7 +72,7 @@ func PutPageHandler(c *gin.Context) {
 
 	path := normalizePath(c.Param("path"))
 
-	_, err := repo.GetFile(path)
+	file, err := repo.GetFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
@@ -85,9 +85,15 @@ func PutPageHandler(c *gin.Context) {
 
 	var data apiRequest
 	if c.BindJSON(&data) == nil {
-		var file = &common.File{
+		var newFile = &common.File{
 			ContentType: "text/markdown",
 			Content: data.Content,
+		}
+
+		err = mergo.Merge(&file, newFile, mergo.WithOverride)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			return
 		}
 
 		err = repo.SaveFile(path, file, repo.Commit{
@@ -131,7 +137,7 @@ func PostPageHandler(c *gin.Context) {
 			return
 		}
 
-		var file = &common.File{
+		var file = common.File{
 			ContentType: "text/markdown",
 			Content: data.Content,
 		}
@@ -191,8 +197,6 @@ func normalizePath(path string) string {
 	} else if path == "" {
 		path = "_default.json"
 	}
-
-	fmt.Println(path)
 
 	return path
 }

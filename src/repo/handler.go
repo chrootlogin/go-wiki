@@ -1,22 +1,22 @@
 package repo
 
 import (
-	"path/filepath"
-	"os"
 	"log"
-	"io/ioutil"
-	"github.com/chrootlogin/go-wiki/src/common"
+	"os"
+	"time"
 	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
+
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	"time"
-	"fmt"
+
+	"github.com/chrootlogin/go-wiki/src/common"
 )
 
 func HasRaw(path string) bool {
-	path = filepath.Join(repositoryPath, path)
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	wt, _ := repo.Worktree()
+	if _, err := wt.Filesystem.Stat(path); os.IsNotExist(err) {
 		return false
 	}
 
@@ -30,61 +30,86 @@ func HasFile(path string) bool {
 }
 
 func GetRaw(path string) ([]byte, error) {
-	path = filepath.Join(repositoryPath, path)
+	path = filepath.Join(path)
 
-	// Open json file
-	file, err := os.Open(path)
+	// open workspace
+	wt, err := repo.Worktree()
 	if err != nil {
-		log.Println("open: " + err.Error())
+		log.Println("opening worktree: " + err.Error())
 		return nil, err
 	}
 
-	// Read json file
+	// Open file
+	file, err := wt.Filesystem.OpenFile(path, os.O_RDONLY, R_PERMS)
+	if err != nil {
+		log.Println("open file: " + err.Error())
+		return nil, err
+	}
+
+	// Read file
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Println("read file: " + err.Error())
 		return nil, err
 	}
 
-	return data, nil
-}
-
-func GetFile(path string) (*common.File, error) {
-	path = filepath.Join("pages", path)
-
-	commits := getCommitHistoryOfFile(path)
-	fmt.Println(commits)
-
-	data, err := GetRaw(path)
+	err = file.Close()
 	if err != nil {
+		log.Println("close file: " + err.Error())
 		return nil, err
 	}
 
+	return data, nil
+}
+
+func GetFile(path string) (common.File, error) {
+	path = filepath.Join("pages", path)
+
+	/*commits := getCommitHistoryOfFile(path)
+	fmt.Println(commits)*/
+
+	data, err := GetRaw(path)
+	if err != nil {
+		return common.File{}, err
+	}
+
 	// Convert json to object
-	var file = &common.File{}
-	err = json.Unmarshal(data, file)
+	var file = common.File{}
+	err = json.Unmarshal(data, &file)
 	if err != nil {
 		log.Println("unmarshal: " + err.Error())
-		return nil, err
+		return common.File{}, err
 	}
 
 	return file, nil
 }
 
 func SaveRaw(path string, data []byte, commit Commit) error {
-	diskPath := filepath.Join(repositoryPath, path)
-
-	// Write file
-	err := ioutil.WriteFile(diskPath, data, permissions)
+	// open workspace
+	wt, err := repo.Worktree()
 	if err != nil {
-		log.Println("write file: " + err.Error())
+		log.Println("opening worktree: " + err.Error())
 		return err
 	}
 
-	// Open worktree
-	wt, err := repo.Worktree()
+	// Open file
+	file, err := wt.Filesystem.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, R_PERMS)
 	if err != nil {
-		log.Println("worktree: " + err.Error())
+		log.Println("open file: " + err.Error())
+		return err
+	}
+
+	_, err = file.Write(data)
+	if err != nil {
+		file.Close()
+		log.Println("write to file: " + err.Error())
+		return err
+	}
+
+	// close file
+	err = file.Close()
+	if err != nil {
+		log.Println("close file: " + err.Error())
 		return err
 	}
 
@@ -111,10 +136,10 @@ func SaveRaw(path string, data []byte, commit Commit) error {
 	return nil
 }
 
-func SaveFile(path string, file *common.File, commit Commit) error {
+func SaveFile(path string, file common.File, commit Commit) error {
 	path = filepath.Join("pages", path)
 
-	jsonBytes, err := json.Marshal(file)
+	jsonBytes, err := json.Marshal(&file)
 	if err != nil {
 		log.Println("marshal: " + err.Error())
 		return err
