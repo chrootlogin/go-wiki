@@ -34,6 +34,10 @@ func init() {
 	repo = initRepository()
 }
 
+func GetRepo() *git.Repository {
+	return repo
+}
+
 func initRepository() *git.Repository {
 	if _, err := os.Stat(repositoryPath); os.IsNotExist(err) {
 		log.Println("Creating new repository...")

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/imdario/mergo"
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
@@ -29,7 +28,7 @@ type apiResponse struct {
 func GetPageHandler(c *gin.Context) {
 	path := normalizePath(c.Param("path"))
 	
-	file, err := repo.GetFile(path)
+	data, err := PageFS().Get(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found" })
@@ -43,23 +42,16 @@ func GetPageHandler(c *gin.Context) {
 	format := c.Query("format")
 	if format == "no-render" {
 		c.JSON(http.StatusOK, apiResponse{
-			Title: file.Metadata["title"],
-			Content: file.Content,
+			Content: string(data),
 		})
 
 		return
 	}
 
-	if file.ContentType == "text/markdown" {
-		c.JSON(http.StatusOK, apiResponse{
-			Title: file.Metadata["title"],
-			Content: renderPage(file.Content),
-		})
+	c.JSON(http.StatusOK, apiResponse{
+		Content: renderPage(string(data)),
+	})
 
-		return
-	}
-
-	c.JSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Content-type is not allowed here" })
 	return
 }
 
@@ -72,31 +64,14 @@ func PutPageHandler(c *gin.Context) {
 
 	path := normalizePath(c.Param("path"))
 
-	file, err := repo.GetFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+	if !repo.HasWithChroot("pages", path) {
+		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
 		return
 	}
 
 	var data apiRequest
 	if c.BindJSON(&data) == nil {
-		var newFile = &common.File{
-			ContentType: "text/markdown",
-			Content: data.Content,
-		}
-
-		err = mergo.Merge(&file, newFile, mergo.WithOverride)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-			return
-		}
-
-		err = repo.SaveFile(path, file, repo.Commit{
+		err := repo.SaveWithChroot("pages", path, []byte(data.Content), repo.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
 		})
@@ -123,7 +98,7 @@ func PostPageHandler(c *gin.Context) {
 
 	// Get path
 	path := normalizePath(c.Param("path"))
-	if repo.HasFile(path) {
+	if repo.HasWithChroot("pages", path) {
 		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Page already exists, use PUT to edit." })
 		return
 	}
@@ -190,12 +165,12 @@ func normalizePath(path string) string {
 		lastChar := path[len(path)-1:]
 
 		if lastChar == "/" {
-			path += "_default.json"
+			path += "_default.md"
 		} else {
-			path += "/_default.json"
+			path += "/_default.md"
 		}
 	} else if path == "" {
-		path = "_default.json"
+		path = "_default.md"
 	}
 
 	return path

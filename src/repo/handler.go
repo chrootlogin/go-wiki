@@ -29,9 +29,18 @@ func HasFile(path string) bool {
 	return HasRaw(path)
 }
 
-func GetRaw(path string) ([]byte, error) {
-	path = filepath.Join(path)
+func HasWithChroot(basedir string, path string) bool {
+	wt, _ := repo.Worktree()
+	fs, _ := wt.Filesystem.Chroot(basedir)
 
+	if _, err := fs.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
+func GetRaw(path string) ([]byte, error) {
 	// open workspace
 	wt, err := repo.Worktree()
 	if err != nil {
@@ -82,6 +91,103 @@ func GetFile(path string) (common.File, error) {
 	}
 
 	return file, nil
+}
+
+func GetWithChroot(basedir string, path string) ([]byte, error){
+	// open workspace
+	wt, err := repo.Worktree()
+	if err != nil {
+		log.Println("opening worktree: " + err.Error())
+		return nil, err
+	}
+
+	// open chroot
+	fs, err := wt.Filesystem.Chroot(basedir)
+	if err != nil {
+		log.Println("open chroot: " + err.Error())
+		return nil, err
+	}
+
+	// Open file
+	file, err := fs.OpenFile(path, os.O_RDONLY, R_PERMS)
+	if err != nil {
+		log.Println("open file: " + err.Error())
+		return nil, err
+	}
+
+	// Read file
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Println("read file: " + err.Error())
+		return nil, err
+	}
+
+	err = file.Close()
+	if err != nil {
+		log.Println("close file: " + err.Error())
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func SaveWithChroot(basedir string, path string, data []byte, commit Commit) error {
+	// open workspace
+	wt, err := repo.Worktree()
+	if err != nil {
+		log.Println("opening worktree: " + err.Error())
+		return err
+	}
+
+	// open chroot
+	fs, err := wt.Filesystem.Chroot(basedir)
+	if err != nil {
+		log.Println("open chroot: " + err.Error())
+		return err
+	}
+
+	// Open file
+	file, err := fs.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, R_PERMS)
+	if err != nil {
+		log.Println("open file: " + err.Error())
+		return err
+	}
+
+	_, err = file.Write(data)
+	if err != nil {
+		file.Close()
+		log.Println("write to file: " + err.Error())
+		return err
+	}
+
+	// close file
+	err = file.Close()
+	if err != nil {
+		log.Println("close file: " + err.Error())
+		return err
+	}
+
+	// Add file
+	_, err = wt.Add(filepath.Join(basedir, path))
+	if err != nil {
+		log.Println("adding file: " + err.Error())
+		return err
+	}
+
+	// Creating commit
+	_, err = wt.Commit(commit.Message, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  commit.Author.Username,
+			Email: commit.Author.Email,
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		log.Println("commit: " + err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func SaveRaw(path string, data []byte, commit Commit) error {

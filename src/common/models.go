@@ -17,3 +17,8 @@ type File struct {
 	Content     string 			  `json:"content"`
 	Metadata	map[string]string `json:"metadata"`
 }
+
+type Page struct {
+	Content  string			   `json:"content"`
+	Metadata map[string]string `json:"metadata"`
+}
