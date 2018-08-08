@@ -5,10 +5,10 @@ import (
 	"os"
 	"io/ioutil"
 
+	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-git.v4"
 
 	"github.com/chrootlogin/go-wiki/src/repo"
-	"gopkg.in/src-d/go-billy.v4"
 )
 
 const (
