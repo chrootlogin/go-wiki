@@ -14,7 +14,7 @@
                         </p>
                         <ul class="menu-list">
                             <li>
-                                <router-link :to="{ name: 'edit', query: { path: url } }">
+                                <router-link :to="{ name: 'edit', query: { path: page.path } }">
                                     <span>Edit page</span>
                                     <span class="icon is-small">
                                         <i class="fa fa-edit"></i>
@@ -56,7 +56,8 @@
                 error: 0,
                 page: {
                     title: "",
-                    content: ""
+                    content: "",
+                    path: ""
                 },
                 breadcrumb: ""
             }
@@ -85,6 +86,7 @@
                     this.error = 0;
                     this.page = res.body;
                     this.renderBreadcrumb();
+                    console.log(this.page)
                 }, res => {
                     this.error = res.status;
                         this.renderBreadcrumb();

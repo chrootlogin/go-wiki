@@ -20,8 +20,9 @@ type apiRequest struct {
 }
 
 type apiResponse struct {
-	Title 	string   `json:"title,omitempty"`
-	Content string   `json:"content,omitempty"`
+	Title 	string `json:"title,omitempty"`
+	Content string `json:"content,omitempty"`
+	Path    string `json:"path,omitempty"`
 }
 
 // READ
@@ -31,25 +32,35 @@ func GetPageHandler(c *gin.Context) {
 	data, err := PageFS().Get(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found" })
+			// Try index
+			path = normalizeIndexPath(c.Param("path"))
+
+			data, err = PageFS().Get(path)
+			if err != nil {
+				if os.IsNotExist(err) {
+					c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
+					return
+				}
+
+				c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
 		}
-
-		c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-		return
 	}
 
 	format := c.Query("format")
-	if format == "no-render" {
-		c.JSON(http.StatusOK, apiResponse{
-			Content: string(data),
-		})
+	content := string(data)
 
-		return
+	if format != "no-render" {
+		content = renderPage(content)
 	}
 
 	c.JSON(http.StatusOK, apiResponse{
-		Content: renderPage(string(data)),
+		Content: content,
+		Path: path,
 	})
 
 	return
@@ -161,16 +172,24 @@ func renderPage(html string) string {
 }
 
 func normalizePath(path string) string {
+	if path == "/" {
+		path += "index.md"
+	} else {
+		path += ".md"
+	}
+
+	return path
+}
+
+func normalizeIndexPath(path string) string {
 	if len(path) > 0 {
 		lastChar := path[len(path)-1:]
 
 		if lastChar == "/" {
-			path += "_default.md"
+			path += "index.md"
 		} else {
-			path += "/_default.md"
+			path += "/index.md"
 		}
-	} else if path == "" {
-		path = "_default.md"
 	}
 
 	return path

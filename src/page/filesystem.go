@@ -27,6 +27,22 @@ func PageFS() (*filesystem) {
 	return &fs
 }
 
+func (fs *filesystem) Has(path string) (bool, error) {
+	_, chroot, err := getWorktreeAndChroot(fs.r)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = chroot.Stat(path);
+	if os.IsNotExist(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (fs *filesystem) Get(path string) ([]byte, error) {
 	_, chroot, err := getWorktreeAndChroot(fs.r)
 	if err != nil {
