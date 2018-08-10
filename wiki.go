@@ -3,9 +3,7 @@ package main
 import (
 	"os"
 	"log"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+		"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
@@ -39,10 +37,8 @@ func initRouter() {
 	router.Use(cors.New(corsConfig))
 
 	// public routes
-	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/wiki")
-	})
-	router.GET("/wiki/*path", frontend.GetFrontendHandler)
+	router.GET("/", frontend.GetFrontendIndexHandler)
+	router.GET("/assets/*path", frontend.GetFrontendHandler)
 
 	// authentication
 	am := auth.GetAuthMiddleware()

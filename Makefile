@@ -9,7 +9,7 @@ dependencies:
 	$(DEP) ensure
 
 go_app:
-	$(GOBINDATA) -pkg frontend -prefix frontend/dist/ -o src/frontend/frontend.go frontend/dist/
+	$(GOBINDATA) -pkg frontend -prefix frontend/dist/ -o src/frontend/frontend.go frontend/dist/ frontend/dist/assets/
 	$(GOBINDATA) -pkg repo -prefix default/ -o src/repo/default.go default/pages/ default/prefs/
 	$(GOLANG) build -o go-wiki wiki.go
 

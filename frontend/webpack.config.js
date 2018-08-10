@@ -3,7 +3,9 @@ var webpack = require('webpack');
 var htmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/main.js',
+    entry: {
+        './assets/main':'./src/main.js'
+    },
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].[hash].js'

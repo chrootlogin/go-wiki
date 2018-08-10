@@ -10,19 +10,27 @@ import (
 	"github.com/chrootlogin/go-wiki/src/common"
 )
 
+func GetFrontendIndexHandler(c *gin.Context) {
+	content, err := Asset("index.html")
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: err.Error() })
+		return
+	}
+
+	t := time.Now().AddDate(0,0,-30)
+	c.Header("Expires", t.Format(time.RFC1123))
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+
+	c.Header("Content-Type", "text/html")
+
+	c.String(http.StatusOK, string(content))
+}
+
 func GetFrontendHandler(c *gin.Context) {
 	path := c.Param("path")
 
 	if len(path) > 0 {
-		lastChar := path[len(path)-1:]
-
-		if lastChar == "/" {
-			path += "index.html"
-		}
-
-		path = trimLeftChar(path)
-	} else if path == "" {
-		path = "index.html"
+		path = "assets/" + trimLeftChar(path)
 	}
 
 	content, err := Asset(path)
