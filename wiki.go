@@ -14,10 +14,12 @@ import (
 	"github.com/chrootlogin/go-wiki/src/auth"
 )
 
-var port = "8000"
+var port = ""
 
 func main() {
-	if len(os.Getenv("PORT")) > 0 {
+	if len(os.Getenv("PORT")) == 0 {
+		port = "8000"
+	} else {
 		port = os.Getenv("PORT")
 	}
 

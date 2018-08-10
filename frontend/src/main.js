@@ -25,6 +25,15 @@ Vue.use(VeeValidate);
 // Http interceptors: Global response handler
 Vue.http.interceptors.push(function(request, next) {
     next(res => {
+        /*if(res.status === 0) {
+            this.$store.commit('setNotification', {
+                notification: {
+                    type: type,
+                    message: "Backend not available."
+                }
+            });
+        }*/
+
         // on 401 send to login form
         if(res.status === 401 && res.url.substr(-6,6) !== "/login") {
             router.push({path: "/login"});
@@ -55,12 +64,22 @@ Vue.http.interceptors.push(function(request, next) {
                         }
                     });
                 } else {
-                    this.$store.commit('setNotification', {
-                        notification: {
-                            type: "danger",
-                            message: res.body
-                        }
-                    });
+                    //console.log("Test...");
+                    if(res.status === 0) {
+                        this.$store.commit('setNotification', {
+                            notification: {
+                                type: "danger",
+                                message: "Backend not available!"
+                            }
+                        });
+                    } else {
+                        this.$store.commit('setNotification', {
+                            notification: {
+                                type: "danger",
+                                message: res.body
+                            }
+                        });
+                    }
                 }
             }
         }
