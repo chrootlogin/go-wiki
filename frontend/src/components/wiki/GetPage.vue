@@ -86,7 +86,6 @@
                     this.error = 0;
                     this.page = res.body;
                     this.renderBreadcrumb();
-                    console.log(this.page)
                 }, res => {
                     this.error = res.status;
                         this.renderBreadcrumb();

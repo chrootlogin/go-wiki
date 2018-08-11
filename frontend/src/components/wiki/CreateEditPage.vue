@@ -75,12 +75,17 @@
                     path = "";
                 }
 
+                // remove first character if needed
+                if(path.length > 1) {
+                    path = path.substr(1)
+                }
+
                 return path;
             }
         },
         methods: {
             loadAsyncPageData: function() {
-                this.$http.get(this.$store.state.backendURL + '/api/page' + this.path + '?format=no-render').then(
+                this.$http.get(this.$store.state.backendURL + '/api/page/' + this.path + '?format=no-render').then(
                 res => {
                     this.error = 0;
                     this.createMode = false;
@@ -116,10 +121,31 @@
                 );
             },
             redirectToPage: function(homepage) {
+                // on main page, go direct
+                if(homepage === "index.md") {
+                    this.$router.push({
+                        name: "page"
+                    });
+
+                    return
+                }
+
+                // otherwise, clean url
+                if(homepage.endsWith(".md")) {
+                    homepage = homepage.substring(0, homepage.length - 3);
+                }
+
+                if(homepage.endsWith("index")) {
+                    homepage = homepage.substring(0, homepage.length - 5);
+                }
+
+                if(homepage.endsWith("/")) {
+                    homepage = homepage.substring(0, homepage.length - 1);
+                }
+
                 this.$router.push({
                     name: "page",
                     params: {
-                        spaceKey: this.spaceKey,
                         pageSlug: homepage
                     }
                 })

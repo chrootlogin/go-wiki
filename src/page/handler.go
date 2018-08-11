@@ -17,7 +17,6 @@ import (
 )
 
 type apiRequest struct {
-	Path	string `json:"path,omitempty"`
 	Content string `json:"content,omitempty"`
 }
 
@@ -54,6 +53,7 @@ func GetPageHandler(c *gin.Context) {
 	}
 }
 
+// UPDATE
 func PutPageHandler(c *gin.Context) {
 	user, exists := common.GetClientUser(c)
 	if !exists {
@@ -61,16 +61,26 @@ func PutPageHandler(c *gin.Context) {
 		return
 	}
 
-	path := normalizePath(c.Param("path"))
+	path := c.Param("path")
 
-	if !repo.HasWithChroot("pages", path) {
+	fs := filesystem.New(filesystem.WithChroot("pages"))
+	has, err := fs.Has(path)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		return
+	}
+	if !has {
 		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
 		return
 	}
 
 	var data apiRequest
 	if c.BindJSON(&data) == nil {
-		err := repo.SaveWithChroot("pages", path, []byte(data.Content), repo.Commit{
+		file := filesystem.File{
+			Content: data.Content,
+		}
+
+		err := fs.Commit(path, file, repo.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
 		})

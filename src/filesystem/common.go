@@ -1,11 +1,13 @@
 package filesystem
 
 import (
-	"gopkg.in/src-d/go-billy.v4"
-	"github.com/chrootlogin/go-wiki/src/repo"
-	"gopkg.in/src-d/go-git.v4"
 	"os"
 	"errors"
+
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-billy.v4"
+
+	"github.com/chrootlogin/go-wiki/src/repo"
 )
 
 var (
@@ -19,31 +21,35 @@ type File struct {
 }
 
 type filesystem struct {
-	r *git.Repository
-	fs billy.Filesystem
-	err error
-	perms os.FileMode
+	Repository *git.Repository
+	Filesystem billy.Filesystem
+	Worktree *git.Worktree
+	Error error
+	FilePermissionMode os.FileMode
+	Chroot string
 }
 
 func New(options ...Option) *filesystem {
 	// init internal filesystem
 	var fs = &filesystem{
-		r: repo.GetRepo(),
-		perms: 0644,
+		Repository: repo.GetRepo(),
+		FilePermissionMode: 0644,
 	}
 
 	// init worktree
-	wt, err := fs.r.Worktree()
+	wt, err := fs.Repository.Worktree()
 	if err != nil {
-		fs.err = err;
+		fs.Error = err;
 	}
-	fs.fs = wt.Filesystem
+
+	fs.Worktree = wt
+	fs.Filesystem = wt.Filesystem
 
 	// run options
 	for _, option := range options {
 		err := option(fs)
 		if err != nil {
-			fs.err = err
+			fs.Error = err
 		}
 	}
 
@@ -52,11 +58,11 @@ func New(options ...Option) *filesystem {
 
 func (fs *filesystem) Has(path string) (bool, error) {
 	// check for error
-	if fs.err != nil {
-		return false, fs.err
+	if fs.Error != nil {
+		return false, fs.Error
 	}
 
-	if _, err := fs.fs.Stat(path); os.IsNotExist(err) {
+	if _, err := fs.Filesystem.Stat(path); os.IsNotExist(err) {
 		return false, nil
 	} else if err != nil {
 		return false, err
@@ -67,9 +73,18 @@ func (fs *filesystem) Has(path string) (bool, error) {
 
 func (fs *filesystem) Get(path string) (*File, error) {
 	// check for error
-	if fs.err != nil {
-		return nil, fs.err
+	if fs.Error != nil {
+		return nil, fs.Error
 	}
 
 	return readFile(fs, path)
+}
+
+func (fs *filesystem) Commit(path string, file File, commit repo.Commit) error {
+	// check for error
+	if fs.Error != nil {
+		return fs.Error
+	}
+
+	return commitFile(fs, path, []byte(file.Content), commit)
 }
