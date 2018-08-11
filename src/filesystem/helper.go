@@ -40,5 +40,6 @@ func readFile(fs *filesystem, path string) (*File, error) {
 
 	return &File{
 		Content: string(data),
+		FileInfo: fileinfo,
 	}, nil
 }

@@ -80,7 +80,7 @@
         },
         methods: {
             loadAsyncPageData: function() {
-                this.$http.get(this.$store.state.backendURL + '/api/page/' + this.path + '?format=no-render').then(
+                this.$http.get(this.$store.state.backendURL + '/api/page' + this.path + '?format=no-render').then(
                 res => {
                     this.error = 0;
                     this.createMode = false;

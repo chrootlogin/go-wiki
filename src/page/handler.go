@@ -29,7 +29,7 @@ type apiResponse struct {
 
 // READ
 func GetPageHandler(c *gin.Context) {
-	file, err := getPage(c.Param("path"))
+	file, path, err := getPage(c.Param("path"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
@@ -44,12 +44,12 @@ func GetPageHandler(c *gin.Context) {
 	case "no-render":
 		c.JSON(http.StatusOK, apiResponse{
 			Content: file.Content,
-			//Path: path,
+			Path: path,
 		})
 	default:
 		c.JSON(http.StatusOK, apiResponse{
 			Content: renderPage(file.Content),
-			//Path: path,
+			Path: path,
 		})
 	}
 }
@@ -183,55 +183,41 @@ func normalizeIndexPath(path string) string {
 	return path
 }
 
-func getPath(path string) (string, error) {
+func getPage(path string) (*filesystem.File, string, error) {
 	fs := filesystem.New(filesystem.WithChroot("pages"))
 
+	fmt.Println(path)
+
 	// possible paths
-	paths := []string{
-		path,
-		path + ".md",
-		path + "/index.md",
+	var paths []string
+	if path == "/" {
+		paths = []string{
+			"/index.md",
+		}
+	} else {
+		paths = []string{
+			path,
+			path + ".md",
+			path + "/index.md",
+		}
 	}
 
 	for i := range paths {
-		exists, err := fs.Has(paths[i])
-		if err != nil {
-			return "", err
-		}
-		if exists {
-			return paths[i], nil
-		}
-	}
+		effectivePath := paths[i]
 
-	return "", os.ErrNotExist
-}
-
-func getPage(path string) (*filesystem.File, error) {
-	fs := filesystem.New(filesystem.WithChroot("pages"))
-
-	// possible paths
-	paths := []string{
-		path,
-		path + ".md",
-		path + "/index.md",
-	}
-
-	for i := range paths {
-		file, err := fs.Get(paths[i])
+		file, err := fs.Get(effectivePath)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
 			} else if err == filesystem.ErrIsDir {
 				continue
 			} else {
-				fmt.Println(err)
-
-				return nil, err
+				return nil, "", err
 			}
 		}
 
-		return file, nil
+		return file, effectivePath, nil
 	}
 
-	return nil, os.ErrNotExist
+	return nil, "", os.ErrNotExist
 }

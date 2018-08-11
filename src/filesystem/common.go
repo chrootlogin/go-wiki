@@ -15,6 +15,7 @@ var (
 type File struct {
 	Content string
 	Metadata map[string]string
+	FileInfo os.FileInfo
 }
 
 type filesystem struct {
