@@ -34,12 +34,12 @@
         },
         mounted: function () {
             // when user is set, reload permissions
-            this.$store.subscribe((mutation, state) => {
+            /*this.$store.subscribe((mutation, state) => {
                 if(mutation.type === "setUser") {
                     this.setPermissions();
                 }
             });
-            //this.setPermissions();
+            this.setPermissions();*/
         }
     }
 </script>

@@ -7,6 +7,7 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/filesystem"
 )
 
 type UserList struct {
@@ -46,14 +47,14 @@ func (u *UserList) Add(user common.User) error {
 }
 
 func GetUserList() (*UserList, error) {
-	usersRaw, err := repo.GetRaw("prefs/_users.json")
+	usersRaw, err := filesystem.New().Get("prefs/_users.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Convert json to object
 	var users map[string]common.User
-	err = json.Unmarshal(usersRaw, &users)
+	err = json.Unmarshal([]byte(usersRaw.Content), &users)
 	if err != nil {
 		log.Println("unmarshal: " + err.Error())
 		return nil, err
