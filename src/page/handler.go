@@ -139,52 +139,6 @@ func PutPageHandler(c *gin.Context) {
 	}
 }
 
-/*func PostPageHandler(c *gin.Context) {
-	// Get user
-	user, exists := common.GetClientUser(c)
-	if !exists {
-		helper.Unauthorized(c)
-		return
-	}
-
-	// Get path
-	path := normalizePath(c.Param("path"))
-	if repo.HasWithChroot("pages", path) {
-		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, common.ApiResponse{ Message: "Page already exists, use PUT to edit." })
-		return
-	}
-
-	var data apiRequest
-	if c.BindJSON(&data) == nil {
-		dir, _ := filepath.Split(path)
-		err := repo.MkdirPage(dir)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-			return
-		}
-
-		var file = common.File{
-			ContentType: "text/markdown",
-			Content: data.Content,
-		}
-
-		err = repo.SaveFile(path, file, repo.Commit{
-			Author: user,
-			Message: "Created new page: " + path,
-		})
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-			return
-		}
-
-		c.JSON(http.StatusOK, common.ApiResponse{
-			Message: "Created page.",
-		})
-	} else {
-		c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
-	}
-}*/
-
 // GET A PREVIEW
 func PostPreviewHandler(c *gin.Context) {
 	var data apiRequest
@@ -209,16 +163,6 @@ func renderPage(html string) string {
 	output = bluemonday.UGCPolicy().SanitizeBytes(output)
 
 	return string(output)
-}
-
-func normalizePath(path string) string {
-	if path == "/" {
-		path += "index.md"
-	} else {
-		path += ".md"
-	}
-
-	return path
 }
 
 func getPage(path string) (*filesystem.File, string, error) {

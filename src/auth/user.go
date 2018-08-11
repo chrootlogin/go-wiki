@@ -37,7 +37,7 @@ func (u *UserList) Add(user common.User) error {
 		return err
 	}
 
-	err = repo.SaveRaw("prefs/_users.json", jsonData, repo.Commit{})
+	err = filesystem.New().Commit("prefs/_users.json", filesystem.File{Content:string(jsonData)}, repo.Commit{})
 	if err != nil {
 		log.Println("save file: " + err.Error())
 		return err
