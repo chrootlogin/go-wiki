@@ -10,9 +10,6 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-// The default file permissions
-const R_PERMS = 0644
-
 var repositoryPath = ""
 var repo *git.Repository
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
-	"github.com/chrootlogin/go-wiki/src/filesystem"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
 type UserList struct {
