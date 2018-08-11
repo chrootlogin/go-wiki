@@ -3,8 +3,6 @@ package page
 import (
 	"os"
 	"net/http"
-	"path/filepath"
-
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
@@ -24,6 +22,50 @@ type apiResponse struct {
 	Title 	string `json:"title,omitempty"`
 	Content string `json:"content,omitempty"`
 	Path    string `json:"path,omitempty"`
+}
+
+// CREATE
+func PostPageHandler(c *gin.Context) {
+	user, exists := common.GetClientUser(c)
+	if !exists {
+		helper.Unauthorized(c)
+		return
+	}
+
+	path := c.Param("path")
+
+	fs := filesystem.New(filesystem.WithChroot("pages"))
+	has, err := fs.Has(path)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		return
+	}
+	if has {
+		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "File found, use PUT to update." })
+		return
+	}
+
+	var data apiRequest
+	if c.BindJSON(&data) == nil {
+		file := filesystem.File{
+			Content: data.Content,
+		}
+
+		err := fs.Commit(path, file, repo.Commit{
+			Author: user,
+			Message: "Created page: " + path,
+		})
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			return
+		}
+
+		c.JSON(http.StatusOK, common.ApiResponse{
+			Message: "Created page.",
+		})
+	} else {
+		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
+	}
 }
 
 // READ
@@ -97,7 +139,7 @@ func PutPageHandler(c *gin.Context) {
 	}
 }
 
-func PostPageHandler(c *gin.Context) {
+/*func PostPageHandler(c *gin.Context) {
 	// Get user
 	user, exists := common.GetClientUser(c)
 	if !exists {
@@ -141,7 +183,7 @@ func PostPageHandler(c *gin.Context) {
 	} else {
 		c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
-}
+}*/
 
 // GET A PREVIEW
 func PostPreviewHandler(c *gin.Context) {
@@ -174,20 +216,6 @@ func normalizePath(path string) string {
 		path += "index.md"
 	} else {
 		path += ".md"
-	}
-
-	return path
-}
-
-func normalizeIndexPath(path string) string {
-	if len(path) > 0 {
-		lastChar := path[len(path)-1:]
-
-		if lastChar == "/" {
-			path += "index.md"
-		} else {
-			path += "/index.md"
-		}
 	}
 
 	return path

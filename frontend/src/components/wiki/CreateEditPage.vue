@@ -76,8 +76,8 @@
                 }
 
                 // remove first character if needed
-                if(path.length > 1) {
-                    path = path.substr(1)
+                if(path.startsWith("/")) {
+                    path = path.substring(1)
                 }
 
                 return path;
