@@ -1,7 +1,7 @@
 # Gopkg.toml example
 #
 # Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
-# for detailed Gopkg.toml documentation.
+# for detailed Gopkg.toml doc.
 #
 # required = ["github.com/user/thing/cmd/thing"]
 # ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]

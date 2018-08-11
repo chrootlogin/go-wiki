@@ -12,7 +12,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
 	"github.com/chrootlogin/go-wiki/src/helper"
-	"github.com/chrootlogin/go-wiki/src/fs"
+	"github.com/chrootlogin/go-wiki/src/filesystem"
+	"fmt"
 )
 
 type apiRequest struct {
@@ -28,43 +29,29 @@ type apiResponse struct {
 
 // READ
 func GetPageHandler(c *gin.Context) {
-	path := normalizePath(c.Param("path"))
-	
-	data, err := fs.New(fs.WithChroot("pages")).Get(path)
+	file, err := getPage(c.Param("path"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			// Try index file
-			path = normalizeIndexPath(c.Param("path"))
-
-			data, err = fs.New(fs.WithChroot("pages")).Get(path)
-			if err != nil {
-				if os.IsNotExist(err) {
-					c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
-					return
-				}
-
-				c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-				return
-			}
-		} else {
-			c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
 			return
 		}
+
+		c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		return
 	}
 
-	format := c.Query("format")
-	content := string(data)
-
-	if format != "no-render" {
-		content = renderPage(content)
+	switch c.Query("format") {
+	case "no-render":
+		c.JSON(http.StatusOK, apiResponse{
+			Content: file.Content,
+			//Path: path,
+		})
+	default:
+		c.JSON(http.StatusOK, apiResponse{
+			Content: renderPage(file.Content),
+			//Path: path,
+		})
 	}
-
-	c.JSON(http.StatusOK, apiResponse{
-		Content: content,
-		Path: path,
-	})
-
-	return
 }
 
 func PutPageHandler(c *gin.Context) {
@@ -194,4 +181,57 @@ func normalizeIndexPath(path string) string {
 	}
 
 	return path
+}
+
+func getPath(path string) (string, error) {
+	fs := filesystem.New(filesystem.WithChroot("pages"))
+
+	// possible paths
+	paths := []string{
+		path,
+		path + ".md",
+		path + "/index.md",
+	}
+
+	for i := range paths {
+		exists, err := fs.Has(paths[i])
+		if err != nil {
+			return "", err
+		}
+		if exists {
+			return paths[i], nil
+		}
+	}
+
+	return "", os.ErrNotExist
+}
+
+func getPage(path string) (*filesystem.File, error) {
+	fs := filesystem.New(filesystem.WithChroot("pages"))
+
+	// possible paths
+	paths := []string{
+		path,
+		path + ".md",
+		path + "/index.md",
+	}
+
+	for i := range paths {
+		file, err := fs.Get(paths[i])
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			} else if err == filesystem.ErrIsDir {
+				continue
+			} else {
+				fmt.Println(err)
+
+				return nil, err
+			}
+		}
+
+		return file, nil
+	}
+
+	return nil, os.ErrNotExist
 }

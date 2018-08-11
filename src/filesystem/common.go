@@ -1,11 +1,21 @@
-package fs
+package filesystem
 
 import (
 	"gopkg.in/src-d/go-billy.v4"
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"gopkg.in/src-d/go-git.v4"
 	"os"
+	"errors"
 )
+
+var (
+	ErrIsDir = errors.New("Is a directory.")
+)
+
+type File struct {
+	Content string
+	Metadata map[string]string
+}
 
 type filesystem struct {
 	r *git.Repository
@@ -15,7 +25,7 @@ type filesystem struct {
 }
 
 func New(options ...Option) *filesystem {
-	// init internal fs
+	// init internal filesystem
 	var fs = &filesystem{
 		r: repo.GetRepo(),
 		perms: 0644,
@@ -39,7 +49,22 @@ func New(options ...Option) *filesystem {
 	return fs
 }
 
-func (fs *filesystem) Get(path string) ([]byte, error) {
+func (fs *filesystem) Has(path string) (bool, error) {
+	// check for error
+	if fs.err != nil {
+		return false, fs.err
+	}
+
+	if _, err := fs.fs.Stat(path); os.IsNotExist(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (fs *filesystem) Get(path string) (*File, error) {
 	// check for error
 	if fs.err != nil {
 		return nil, fs.err

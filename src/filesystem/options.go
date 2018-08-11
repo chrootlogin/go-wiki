@@ -1,4 +1,4 @@
-package fs
+package filesystem
 
 type Option func(*filesystem) error
 

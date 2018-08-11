@@ -1,3 +1,11 @@
-# A test page
+# Test page
 
-It's a test!
+### Lists
+
+* Point A
+* Point B
+* Point C
+
+1. First
+2. Second
+3. Third

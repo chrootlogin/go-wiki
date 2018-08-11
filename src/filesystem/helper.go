@@ -1,4 +1,4 @@
-package fs
+package filesystem
 
 import (
 	"os"
@@ -6,7 +6,17 @@ import (
 	"io/ioutil"
 )
 
-func readFile(fs *filesystem, path string) ([]byte, error) {
+func readFile(fs *filesystem, path string) (*File, error) {
+	// Get FileInfo
+	fileinfo, err := fs.fs.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if fileinfo.IsDir() {
+		return nil, ErrIsDir
+	}
+
 	// Open file
 	file, err := fs.fs.OpenFile(path, os.O_RDONLY, fs.perms)
 	if err != nil {
@@ -28,5 +38,7 @@ func readFile(fs *filesystem, path string) ([]byte, error) {
 		return nil, err
 	}
 
-	return data, nil
+	return &File{
+		Content: string(data),
+	}, nil
 }
