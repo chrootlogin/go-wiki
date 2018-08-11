@@ -12,6 +12,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
 	"github.com/chrootlogin/go-wiki/src/helper"
+	"github.com/chrootlogin/go-wiki/src/fs"
 )
 
 type apiRequest struct {
@@ -29,13 +30,13 @@ type apiResponse struct {
 func GetPageHandler(c *gin.Context) {
 	path := normalizePath(c.Param("path"))
 	
-	data, err := PageFS().Get(path)
+	data, err := fs.New(fs.WithChroot("pages")).Get(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// Try index
+			// Try index file
 			path = normalizeIndexPath(c.Param("path"))
 
-			data, err = PageFS().Get(path)
+			data, err = fs.New(fs.WithChroot("pages")).Get(path)
 			if err != nil {
 				if os.IsNotExist(err) {
 					c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
