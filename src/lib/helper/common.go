@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
 func Unauthorized(c *gin.Context) {

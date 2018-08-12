@@ -9,8 +9,8 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/imdario/mergo"
 
-	"github.com/chrootlogin/go-wiki/src/repo"
-	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/lib/repo"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )

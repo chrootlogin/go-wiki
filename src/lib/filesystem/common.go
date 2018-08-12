@@ -7,7 +7,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-billy.v4"
 
-	"github.com/chrootlogin/go-wiki/src/repo"
+	"github.com/chrootlogin/go-wiki/src/lib/repo"
 	"encoding/json"
 )
 

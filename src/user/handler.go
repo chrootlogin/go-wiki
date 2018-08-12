@@ -10,7 +10,7 @@ import (
 	"github.com/badoux/checkmail"
 	"github.com/gin-gonic/gin"
 
-	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/auth"
 )
 

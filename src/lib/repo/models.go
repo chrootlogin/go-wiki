@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/chrootlogin/go-wiki/src/common"
+import "github.com/chrootlogin/go-wiki/src/lib/common"
 
 type Commit struct {
 	Message string

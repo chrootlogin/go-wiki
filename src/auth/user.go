@@ -5,8 +5,8 @@ import (
 	"errors"
 	"encoding/json"
 
-	"github.com/chrootlogin/go-wiki/src/repo"
-	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/lib/repo"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 

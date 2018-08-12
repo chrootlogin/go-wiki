@@ -10,7 +10,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
-	"github.com/chrootlogin/go-wiki/src/repo"
+	"github.com/chrootlogin/go-wiki/src/lib/repo"
 )
 
 func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {

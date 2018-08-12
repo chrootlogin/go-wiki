@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 
-	"github.com/chrootlogin/go-wiki/src/common"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
 type AuthMiddleware struct {
