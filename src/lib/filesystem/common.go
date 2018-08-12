@@ -8,6 +8,7 @@ import (
 	"gopkg.in/src-d/go-billy.v4"
 
 	"github.com/chrootlogin/go-wiki/src/repo"
+	"encoding/json"
 )
 
 var (
@@ -16,15 +17,13 @@ var (
 
 type File struct {
 	Content string
-	Metadata map[string]string
+	Metadata Metadata
 	FileInfo os.FileInfo
 }
 
-type MetaData struct {
-	Permissions interface{}
+type Metadata struct {
+	Permissions map[string][]string `json:"permissions"`
 }
-
-
 
 type filesystem struct {
 	Repository *git.Repository
@@ -98,8 +97,28 @@ func (fs *filesystem) Get(path string) (*File, error) {
 		FileInfo: fileinfo,
 	}
 
+	// if metadata enabled, get metadata file if available
 	if fs.WithMetadata {
+		metajson, _, err := readFile(fs, path + ".meta")
+		if err != nil {
+			// if meta file is not available, return empty metadata
+			if os.IsNotExist(err) {
+				file.Metadata = Metadata{}
+				return file, nil
+			}
 
+			// otherwise return error
+			return nil, err
+		}
+
+		// unmarshal and add metadata
+		var metadata Metadata
+		err = json.Unmarshal(metajson, &metadata)
+		if err != nil {
+			return nil, err
+		}
+
+		file.Metadata = metadata
 	}
 
 	return file, nil
@@ -111,5 +130,19 @@ func (fs *filesystem) Commit(path string, file File, commit repo.Commit) error {
 		return fs.Error
 	}
 
-	return commitFile(fs, path, []byte(file.Content), commit)
+	err := commitFile(fs, path, []byte(file.Content), commit)
+	if err != nil {
+		return err
+	}
+
+	if fs.WithMetadata {
+		metadata, err := json.Marshal(file.Metadata)
+		if err != nil {
+			return err
+		}
+
+		return commitFile(fs, path + ".meta", metadata, commit)
+	}
+
+	return nil
 }

@@ -11,8 +11,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/common"
 	"github.com/chrootlogin/go-wiki/src/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	"fmt"
-)
+	)
 
 type apiRequest struct {
 	Content string `json:"content,omitempty"`
@@ -34,7 +33,7 @@ func PostPageHandler(c *gin.Context) {
 
 	path := c.Param("path")
 
-	fs := filesystem.New(filesystem.WithChroot("pages"))
+	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
 	has, err := fs.Has(path)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
@@ -49,7 +48,16 @@ func PostPageHandler(c *gin.Context) {
 	if c.BindJSON(&data) == nil {
 		file := filesystem.File{
 			Content: data.Content,
+			Metadata: filesystem.Metadata{
+				Permissions: map[string][]string{
+					// allow anyone to read
+					"anyone": []string{"r"},
+				},
+			},
 		}
+
+		// add default permissions for author
+		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w"}
 
 		err := fs.Commit(path, file, repo.Commit{
 			Author: user,
@@ -105,7 +113,7 @@ func PutPageHandler(c *gin.Context) {
 
 	path := c.Param("path")
 
-	fs := filesystem.New(filesystem.WithChroot("pages"))
+	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
 	has, err := fs.Has(path)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
@@ -166,9 +174,7 @@ func renderPage(html string) string {
 }
 
 func getPage(path string) (*filesystem.File, string, error) {
-	fs := filesystem.New(filesystem.WithChroot("pages"))
-
-	fmt.Println(path)
+	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
 
 	// possible paths
 	var paths []string

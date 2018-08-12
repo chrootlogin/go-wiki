@@ -97,7 +97,3 @@ func commitFile(fs *filesystem, path string, data []byte, commit repo.Commit) er
 
 	return nil
 }
-
-func loadMetadata(fs *filesystem, path string) {
-
-}
