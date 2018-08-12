@@ -13,42 +13,39 @@ import (
 	"github.com/chrootlogin/go-wiki/src/repo"
 )
 
-func readFile(fs *filesystem, path string) (*File, error) {
+func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
 	// Get FileInfo
 	fileinfo, err := fs.Filesystem.Stat(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if fileinfo.IsDir() {
-		return nil, ErrIsDir
+		return nil, nil, ErrIsDir
 	}
 
 	// Open file
 	file, err := fs.Filesystem.OpenFile(path, os.O_RDONLY, fs.FilePermissionMode)
 	if err != nil {
 		log.Println("open file: " + err.Error())
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Read file
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Println("read file: " + err.Error())
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Close file
 	err = file.Close()
 	if err != nil {
 		log.Println("close file: " + err.Error())
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &File{
-		Content: string(data),
-		FileInfo: fileinfo,
-	}, nil
+	return data, fileinfo, nil
 }
 
 func commitFile(fs *filesystem, path string, data []byte, commit repo.Commit) error {
@@ -73,9 +70,9 @@ func commitFile(fs *filesystem, path string, data []byte, commit repo.Commit) er
 		return err
 	}
 
-	// Add file
-	if len(fs.Chroot) > 0 {
-		_, err = fs.Worktree.Add(filepath.Join(fs.Chroot, path))
+	// Add file, and use chroot if needed
+	if len(fs.ChrootDirectory) > 0 {
+		_, err = fs.Worktree.Add(filepath.Join(fs.ChrootDirectory, path))
 	} else {
 		_, err = fs.Worktree.Add(path)
 	}
@@ -99,4 +96,8 @@ func commitFile(fs *filesystem, path string, data []byte, commit repo.Commit) er
 	}
 
 	return nil
+}
+
+func loadMetadata(fs *filesystem, path string) {
+
 }

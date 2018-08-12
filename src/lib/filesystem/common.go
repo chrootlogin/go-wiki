@@ -20,26 +20,37 @@ type File struct {
 	FileInfo os.FileInfo
 }
 
+type MetaData struct {
+	Permissions interface{}
+}
+
+
+
 type filesystem struct {
 	Repository *git.Repository
 	Filesystem billy.Filesystem
 	Worktree *git.Worktree
 	Error error
 	FilePermissionMode os.FileMode
-	Chroot string
+	ChrootDirectory string
+	WithMetadata bool
 }
 
 func New(options ...Option) *filesystem {
-	// init internal filesystem
+	// set default values
 	var fs = &filesystem{
 		Repository: repo.GetRepo(),
 		FilePermissionMode: 0644,
+		ChrootDirectory: "",
+		WithMetadata: false,
 	}
 
 	// init worktree
 	wt, err := fs.Repository.Worktree()
 	if err != nil {
 		fs.Error = err;
+		// return broken fs, error will be catched in chained function
+		return fs
 	}
 
 	fs.Worktree = wt
@@ -77,7 +88,21 @@ func (fs *filesystem) Get(path string) (*File, error) {
 		return nil, fs.Error
 	}
 
-	return readFile(fs, path)
+	data, fileinfo, err := readFile(fs, path)
+	if err != nil {
+		return nil, err
+	}
+
+	file := &File{
+		Content: string(data),
+		FileInfo: fileinfo,
+	}
+
+	if fs.WithMetadata {
+
+	}
+
+	return file, nil
 }
 
 func (fs *filesystem) Commit(path string, file File, commit repo.Commit) error {

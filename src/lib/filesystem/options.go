@@ -9,8 +9,16 @@ func WithChroot(chrootDir string) Option {
 			return err
 		}
 
-		fs.Chroot = chrootDir
+		fs.ChrootDirectory = chrootDir
 		fs.Filesystem = newFs
+
+		return nil
+	}
+}
+
+func WithMetadata() Option {
+	return func(fs *filesystem) error {
+		fs.WithMetadata = true
 
 		return nil
 	}
