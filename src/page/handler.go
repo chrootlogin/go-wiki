@@ -3,15 +3,16 @@ package page
 import (
 	"os"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
-	"github.com/chrootlogin/go-wiki/src/helper"
+	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	)
+)
 
 type apiRequest struct {
 	Content string `json:"content,omitempty"`
