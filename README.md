@@ -34,9 +34,10 @@ The documentation is available on every new instance by default. [But you can al
 To work on go-wiki, you need to have Golang and NodeJS installed.
 
 ### Dependencies
- * [NodeJS](https://nodejs.org) 8.x and NPM
- * [Golang](https://golang.org/) 1.10.x
- * [Dep](https://golang.github.io/dep/) 0.43.x
+
+* [NodeJS](https://nodejs.org) 8.x and NPM
+* [Golang](https://golang.org/) 1.10.x
+* [Dep](https://golang.github.io/dep/) 0.43.x
 
 ### Running
 
