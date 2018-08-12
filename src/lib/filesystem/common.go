@@ -3,12 +3,12 @@ package filesystem
 import (
 	"os"
 	"errors"
+	"encoding/json"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-billy.v4"
 
 	"github.com/chrootlogin/go-wiki/src/lib/repo"
-	"encoding/json"
 )
 
 var (
@@ -124,7 +124,7 @@ func (fs *filesystem) Get(path string) (*File, error) {
 	return file, nil
 }
 
-func (fs *filesystem) Commit(path string, file File, commit repo.Commit) error {
+func (fs *filesystem) Commit(path string, file File, commit Commit) error {
 	// check for error
 	if fs.Error != nil {
 		return fs.Error

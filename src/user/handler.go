@@ -62,7 +62,7 @@ func RegisterHandler(c *gin.Context) {
 	}
 }
 
-func validateNewUser(userList *auth.UserList, name string, password string, email string) error {
+func validateNewUser(ul *auth.UserList, name string, password string, email string) error {
 	if len(name) <= 3 {
 		return errors.New("Username must be at least 3 chars.")
 	}
@@ -85,7 +85,7 @@ func validateNewUser(userList *auth.UserList, name string, password string, emai
 		return errors.New("The email address is invalid.")
 	}
 
-	_, err = userList.Get(name)
+	_, err = ul.Get(name)
 	if err == nil {
 		return errors.New("Sorry, the username '" + name + "' is already taken.")
 	}

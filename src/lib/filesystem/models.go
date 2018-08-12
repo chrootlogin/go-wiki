@@ -1,4 +1,4 @@
-package repo
+package filesystem
 
 import "github.com/chrootlogin/go-wiki/src/lib/common"
 

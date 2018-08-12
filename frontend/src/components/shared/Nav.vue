@@ -151,7 +151,7 @@
                     message: 'Du wurdest ausgeloggt'
                 });
 
-                this.$router.push({path: '/login'});
+                this.$router.push({path: '/'});
             }
         }
     }

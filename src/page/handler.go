@@ -2,20 +2,19 @@ package page
 
 import (
 	"os"
-		"net/http"
+	"time"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/imdario/mergo"
+	"github.com/patrickmn/go-cache"
 
-	"github.com/chrootlogin/go-wiki/src/lib/repo"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	"time"
-	"github.com/patrickmn/go-cache"
-	)
+)
 
 var (
 	pageCache *cache.Cache
@@ -72,7 +71,7 @@ func PostPageHandler(c *gin.Context) {
 		// add default permissions for author: "read, write, admin"
 		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
 
-		err := fs.Commit(path, file, repo.Commit{
+		err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Created page: " + path,
 		})
@@ -170,7 +169,7 @@ func PutPageHandler(c *gin.Context) {
 			return
 		}
 
-		err := fs.Commit(path, file, repo.Commit{
+		err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
 		})

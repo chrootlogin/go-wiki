@@ -9,8 +9,6 @@ import (
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
-
-	"github.com/chrootlogin/go-wiki/src/lib/repo"
 )
 
 func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
@@ -48,7 +46,7 @@ func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
 	return data, fileinfo, nil
 }
 
-func commitFile(fs *filesystem, path string, data []byte, commit repo.Commit) error {
+func commitFile(fs *filesystem, path string, data []byte, commit Commit) error {
 	// Open file
 	file, err := fs.Filesystem.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fs.FilePermissionMode)
 	if err != nil {

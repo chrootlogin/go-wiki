@@ -70,7 +70,7 @@ func initRepository() *git.Repository {
 		// Creating initial commit
 		_, err = wt.Commit("Initial commit...", &git.CommitOptions{
 			Author: &object.Signature{
-				Name:  "Go Wiki",
+				Name:  "system",
 				Email: "go-wiki@example.org",
 				When:  time.Now(),
 			},

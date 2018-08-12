@@ -20,7 +20,6 @@ func GetFrontendIndexHandler(c *gin.Context) {
 	t := time.Now().AddDate(0,0,-30)
 	c.Header("Expires", t.Format(time.RFC1123))
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
-
 	c.Header("Content-Type", "text/html")
 
 	c.String(http.StatusOK, string(content))
