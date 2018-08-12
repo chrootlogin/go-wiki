@@ -1,4 +1,4 @@
-# Go-Wiki (WIP)
+# Go-Wiki
 
 **This is work in progress!**
 
@@ -24,6 +24,10 @@ The following user is available on a new go-wiki installation:
 * **Password:** admin1234
  
 **Please change this credentials on your first login or delete the user!**
+
+## Documentation
+
+The documentation is available on every new instance by default. [But you can also find it in the repository](default/pages/docs/index.md).
 
 ## Development
 
