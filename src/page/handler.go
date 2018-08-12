@@ -14,6 +14,11 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"time"
+	"github.com/patrickmn/go-cache"
+	)
+
+var (
+	pageCache *cache.Cache
 )
 
 type apiRequest struct {
@@ -25,6 +30,10 @@ type apiResponse struct {
 	Content      string `json:"content,omitempty"`
 	Path         string `json:"path,omitempty"`
 	LastModified string `json:"last-modified,omitempty"`
+}
+
+func init() {
+	pageCache = cache.New(5*time.Minute, 10*time.Minute)
 }
 
 // CREATE
@@ -82,7 +91,22 @@ func PostPageHandler(c *gin.Context) {
 
 // READ
 func GetPageHandler(c *gin.Context) {
-	file, path, err := getPage(c.Param("path"))
+	path := c.Param("path")
+	format := c.Query("format")
+	cacheKey := path + "." + format
+
+	// check if url is cached
+	cachedResponse, found := pageCache.Get(cacheKey)
+	if found {
+		resp := cachedResponse.(apiResponse)
+
+		c.Header("Last-Modified", resp.LastModified)
+		c.JSON(http.StatusOK, cachedResponse)
+		return
+	}
+
+	// otherwise, render
+	file, path, err := getPage(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.JSON(http.StatusNotFound, common.ApiResponse{Message: "Not found"})
@@ -94,17 +118,20 @@ func GetPageHandler(c *gin.Context) {
 	}
 
 	lastModified := file.FileInfo.ModTime().Format(time.RFC1123)
-	var response  = apiResponse{
+	var response = apiResponse{
 		Path: path,
 		LastModified: lastModified,
 	}
 
-	switch c.Query("format") {
+	switch format {
 	case "no-render":
 		response.Content = file.Content
 	default:
 		response.Content = renderPage(file.Content)
 	}
+
+	// cache page response
+	pageCache.Set(cacheKey, response, cache.DefaultExpiration)
 
 	c.Header("Last-Modified", lastModified)
 	c.JSON(http.StatusOK, response)
@@ -151,6 +178,9 @@ func PutPageHandler(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
 		}
+
+		// flush pageCache @TODO
+		pageCache.Flush()
 
 		c.JSON(http.StatusOK, common.ApiResponse{
 			Message: "Updated page.",

@@ -9,10 +9,10 @@
             <div class="columns">
                 <div class="column is-one-fifth">
                     <aside class="menu">
-                        <p class="menu-label">
+                        <p v-if="user" class="menu-label">
                             Page Administration
                         </p>
-                        <ul class="menu-list">
+                        <ul v-if="user" class="menu-list">
                             <li>
                                 <router-link :to="{ name: 'edit', query: { path: page.path } }">
                                     <span>Edit page</span>
@@ -38,10 +38,26 @@
                                 </a>
                             </li>
                         </ul>
+                        <p class="menu-label">
+                            Advanced
+                        </p>
+                        <ul class="menu-list">
+                            <li>
+                                <a v-bind:href="apiUrl">
+                                    <span>API Url</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-code"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
                     </aside>
                 </div>
                 <div class="column">
                     <article class="content" v-html="page.content"></article>
+                    <div class="meta has-text-grey is-size-7">
+                        Last modified: {{ page["last-modified"] }} | Request time: {{ requestTime }} ms
+                    </div>
                 </div>
             </div>
         </div>
@@ -55,11 +71,12 @@
                 loading: false,
                 error: 0,
                 page: {
-                    title: "",
-                    content: "",
-                    path: ""
+                    "content": "",
+                    "path": "",
+                    "last-modified": ""
                 },
-                breadcrumb: ""
+                breadcrumb: "",
+                requestTime: 0
             }
         },
         computed: {
@@ -70,40 +87,64 @@
                 }
 
                 return url;
+            },
+            user() {
+                return this.$store.state.user;
+            },
+            apiUrl() {
+                return this.$store.state.backendURL + '/api/page/' + this.url
             }
         },
         props: ['pageSlug'],
         methods: {
-            loadAsyncPageData: function() {
-                var pageSlug = this.pageSlug;
+            loadPage: function() {
+                let pageSlug = this.pageSlug;
                 // fix url if needed...
                 if(pageSlug == null) {
                     pageSlug = "";
                 }
 
+                // always remove index.md
+                if(pageSlug.endsWith("index.md")) {
+                    this.redirectToPage(
+                        pageSlug.substring(0, pageSlug.length - 9)
+                    );
+                    return
+                }
+
+                let startRequest = new Date().getTime();
                 this.$http.get(this.$store.state.backendURL + '/api/page/' + pageSlug).then(
                 res => {
-                    this.error = 0;
-                    this.page = res.body;
-                    this.renderBreadcrumb();
-                }, res => {
-                    this.error = res.status;
+                        this.error = 0;
+                        this.page = res.body;
                         this.renderBreadcrumb();
-                });
+
+                        // set request time
+                        let endRequest = new Date().getTime();
+                        this.requestTime = endRequest - startRequest;
+                    }, res => {
+                        this.error = res.status;
+                        this.renderBreadcrumb();
+                    }
+                );
             },
             renderBreadcrumb: function() {
                 let pageSlug = this.url;
                 let htmlList = [];
 
                 if(pageSlug == null || pageSlug === "") {
-                    pageSlug = [];
-                    htmlList.push("<li class='is-active'><a href='#/wiki'><i class='fa fa-home'></i> Home</a></li>");
-                } else {
-                    pageSlug = pageSlug.split("/");
-                    htmlList.push("<li><a href='#/wiki'><i class='fa fa-home'></i> Home</a></li>");
+                    this.breadcrumb = "<li class='is-active'><a href='#/wiki'><i class='fa fa-home'></i> Home</a></li>";
+                    return
                 }
 
-                let lastElement = htmlList.length;
+                pageSlug = pageSlug.split("/");
+                if(this.page.path.endsWith("/index.md")) {
+                    pageSlug.push("Home")
+                }
+
+                htmlList.push("<li><a href='#/wiki'><i class='fa fa-home'></i> Home</a></li>");
+
+                let lastElement = pageSlug.length - 1;
                 let fullUrl = "#/wiki/";
                 pageSlug.forEach((slug, index) => {
                     fullUrl += slug + "/";
@@ -118,12 +159,19 @@
                 // set breadcrumb
                 this.breadcrumb = htmlList.join("");
             },
-            redirectToPage: function(homepage) {
+            redirectToPage: function(page) {
+                if(page === "") {
+                    this.$router.push({
+                        name: "page"
+                    });
+
+                    return
+                }
+
                 this.$router.push({
                     name: "page",
                     params: {
-                        spaceKey: this.spaceKey,
-                        pageSlug: homepage
+                        pageSlug: page
                     }
                 })
             },
@@ -132,7 +180,8 @@
                     message: `URL of the new page?`,
                     inputAttrs: {
                         placeholder: 'e.g. my_page/',
-                        maxlength: 255
+                        maxlength: 255,
+                        value: this.basename(this.page.path)
                     },
                     onConfirm: (value) => {
                         this.$router.push({
@@ -154,18 +203,23 @@
                             message: 'Page deleted!'
                         });
 
-                        this.loadAsyncPageData();
+                        this.loadPage();
                     }, res => {
                         this.error = res.status;
                     });
+            },
+            basename(path) {
+                return path.substring(0, path.lastIndexOf('/') + 1);
             }
         },
         mounted: function() {
-            this.loadAsyncPageData();
+            this.loadPage();
         },
         watch: {
             '$route' (to, from) {
-                if(to !== from) this.loadAsyncPageData();
+                if(to !== from) {
+                    this.loadPage();
+                }
             }
         }
     };

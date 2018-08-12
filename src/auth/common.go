@@ -1,6 +1,17 @@
 package auth
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+	"github.com/patrickmn/go-cache"
+)
+
+var authCache *cache.Cache
+
+func init() {
+	authCache = cache.New(30 * time.Minute, 10 * time.Minute)
+}
 
 // Hash a password with bcrypt
 func HashPassword(password string) (string, error) {

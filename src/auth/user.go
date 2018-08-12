@@ -5,6 +5,8 @@ import (
 	"errors"
 	"encoding/json"
 
+	"github.com/patrickmn/go-cache"
+
 	"github.com/chrootlogin/go-wiki/src/lib/repo"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
@@ -43,10 +45,24 @@ func (u *UserList) Add(user common.User) error {
 		return err
 	}
 
+	// remove users from cache
+	authCache.Delete("users")
+
 	return nil
 }
 
 func GetUserList() (*UserList, error) {
+	// check if users are in cache
+	cachedUsers, found := authCache.Get("users")
+	if found {
+		userList := &UserList{
+			Users: cachedUsers.(map[string]common.User),
+		}
+
+		return userList, nil
+	}
+
+	// otherwise read from disk
 	usersRaw, err := filesystem.New().Get("prefs/_users.json")
 	if err != nil {
 		log.Fatal(err)
@@ -60,22 +76,12 @@ func GetUserList() (*UserList, error) {
 		return nil, err
 	}
 
+	// add to cache
+	authCache.Set("users", users, cache.DefaultExpiration)
+
 	var userList = &UserList{
 		Users: users,
 	}
 
 	return userList, nil
-}
-
-func GetUserById(userId string) (common.User, error) {
-	ul, err := GetUserList()
-	if err != nil {
-		return common.User{}, err
-	}
-	u, err := ul.Get(userId)
-	if err != nil {
-		return common.User{}, err
-	}
-
-	return u, err
 }

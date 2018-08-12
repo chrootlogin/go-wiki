@@ -6,7 +6,7 @@ import VeeValidate, { Validator } from 'vee-validate';
 import VeeValidateEnglish from 'vee-validate/dist/locale/en';
 // Styles
 import 'buefy/lib/buefy.css';
-//import './theme.css';
+import './custom.css'
 // Store
 import store from './store';
 // Components
