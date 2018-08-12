@@ -57,8 +57,8 @@ func PostPageHandler(c *gin.Context) {
 			},
 		}
 
-		// add default permissions for author
-		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w"}
+		// add default permissions for author: "read, write, admin"
+		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
 
 		err := fs.Commit(path, file, repo.Commit{
 			Author: user,
