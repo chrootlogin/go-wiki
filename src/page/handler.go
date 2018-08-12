@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/imdario/mergo"
 
 	"github.com/chrootlogin/go-wiki/src/repo"
 	"github.com/chrootlogin/go-wiki/src/common"
@@ -115,13 +116,14 @@ func PutPageHandler(c *gin.Context) {
 	path := c.Param("path")
 
 	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
-	has, err := fs.Has(path)
+	oldFile, err := fs.Get(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
+			return
+		}
+
 		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
-		return
-	}
-	if !has {
-		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
 		return
 	}
 
@@ -129,6 +131,11 @@ func PutPageHandler(c *gin.Context) {
 	if c.BindJSON(&data) == nil {
 		file := filesystem.File{
 			Content: data.Content,
+		}
+
+		if err := mergo.Merge(&file, oldFile); err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			return
 		}
 
 		err := fs.Commit(path, file, repo.Commit{
