@@ -2,7 +2,7 @@ package page
 
 import (
 	"os"
-	"net/http"
+		"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
@@ -13,6 +13,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"time"
 )
 
 type apiRequest struct {
@@ -20,9 +21,10 @@ type apiRequest struct {
 }
 
 type apiResponse struct {
-	Title 	string `json:"title,omitempty"`
-	Content string `json:"content,omitempty"`
-	Path    string `json:"path,omitempty"`
+	Title 	     string `json:"title,omitempty"`
+	Content      string `json:"content,omitempty"`
+	Path         string `json:"path,omitempty"`
+	LastModified string `json:"last-modified,omitempty"`
 }
 
 // CREATE
@@ -91,18 +93,21 @@ func GetPageHandler(c *gin.Context) {
 		return
 	}
 
+	lastModified := file.FileInfo.ModTime().Format(time.RFC1123)
+	var response  = apiResponse{
+		Path: path,
+		LastModified: lastModified,
+	}
+
 	switch c.Query("format") {
 	case "no-render":
-		c.JSON(http.StatusOK, apiResponse{
-			Content: file.Content,
-			Path: path,
-		})
+		response.Content = file.Content
 	default:
-		c.JSON(http.StatusOK, apiResponse{
-			Content: renderPage(file.Content),
-			Path: path,
-		})
+		response.Content = renderPage(file.Content)
 	}
+
+	c.Header("Last-Modified", lastModified)
+	c.JSON(http.StatusOK, response)
 }
 
 // UPDATE
