@@ -31,7 +31,7 @@ RUN set -ex \
     && sync \
     && GOOS=linux GOARCH=amd64 CGO_ENABLED=1 make
 
-# Build agw container
+# Build go-wiki container
 FROM alpine:3.8
 
 ARG BUILD_DATE
