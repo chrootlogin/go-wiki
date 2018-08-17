@@ -7,9 +7,9 @@ import (
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
-	"github.com/chrootlogin/go-wiki/src/frontend"
-	"github.com/chrootlogin/go-wiki/src/user"
+		"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
 var port = ""
@@ -37,8 +37,9 @@ func initRouter() {
 	router.Use(cors.New(corsConfig))
 
 	// public routes
-	router.GET("/", frontend.GetFrontendIndexHandler)
-	router.GET("/assets/*path", frontend.GetFrontendHandler)
+	//router.GET("/", frontend.GetFrontendIndexHandler)
+	//router.GET("/assets/*path", frontend.GetFrontendHandler)
+
 
 	// authentication
 	am := auth.GetAuthMiddleware()
@@ -55,6 +56,8 @@ func initRouter() {
 
 		api.POST("/preview", page.PostPreviewHandler)
 	}
+
+	common.LoadPlugins(router)
 
 	router.Run(":" + port)
 }
