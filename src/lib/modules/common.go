@@ -26,6 +26,15 @@ func RegisterModule(name string, ctor func() interface{}) {
 	log.Println(fmt.Sprintf("registering module: %s", name))
 
 	mods[name] = ctor
+
+	module := NewModule(name)
+	if module == nil {
+		log.Fatal(fmt.Sprintf("Couldn't init module: %s", name))
+	}
+
+	ctx := context.Background()
+
+	module.Init(ctx, "lalala")
 }
 
 // NewModule instantiates a new instance of the module type with the

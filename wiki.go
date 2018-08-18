@@ -54,7 +54,7 @@ func initRouter() {
 		api.POST("/preview", page.PostPreviewHandler)
 	}
 
-	common.GetPluginRegistry().RunEngine(router)
+	//common.GetPluginRegistry().RunEngine(router)
 
 	router.Run(":" + port)
 }

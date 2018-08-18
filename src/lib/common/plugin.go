@@ -37,7 +37,9 @@ func (gr goWikiPluginRegistry) RunEngine(engine *gin.Engine) {
 }*/
 
 func LoadPlugins() {
-	all_plugins, err := filepath.Glob("modules/*.so")
+
+	fmt.Println("Loading plugins...")
+	all_plugins, err := filepath.Glob("plugins/*.so")
 	if err != nil {
 		panic(err)
 	}
@@ -48,16 +50,22 @@ func LoadPlugins() {
 			log.Fatal(fmt.Sprintf("error: failed to load plugin: %v\n", err))
 		}
 
+		fmt.Println(p)
+
 		tmapObj, err := p.Lookup("Types")
 		if err != nil {
 			log.Fatal(fmt.Sprintf("error: failed to lookup type map: %v\n", err))
 		}
+
+		fmt.Println(tmapObj)
 
 		// assert that the Types symbol is a *map[string]func() interface{}
 		tmapPtr, tmapOk := tmapObj.(*map[string]func() interface{})
 		if !tmapOk {
 			log.Fatal(fmt.Sprintf("error: invalid type map: %T\n", tmapObj))
 		}
+
+		fmt.Println(tmapPtr)
 
 		// assert that the type map pointer is not nil
 		if tmapPtr == nil {
@@ -66,6 +74,8 @@ func LoadPlugins() {
 
 		// dereference the type map pointer
 		tmap := *tmapPtr
+
+		fmt.Println(tmap)
 
 		// register the plug-in's modules
 		for k, v := range tmap {
