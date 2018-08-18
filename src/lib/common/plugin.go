@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"plugin"
 	"log"
-	"github.com/chrootlogin/go-wiki/src/lib/modules"
 	"sync"
-	)
+)
+
+// Module is the interface implemented by types that
+// register themselves as modular plug-ins.
+type GoWikiModule interface {
+	Init() error
+	Version() string
+}
 
 type goWikiPluginRegistry struct {
-	plugins map[string]modules.Module
+	plugins map[string]GoWikiModule
 }
 
 var instance *goWikiPluginRegistry
@@ -19,13 +25,13 @@ var once sync.Once
 func GetPluginRegistry() *goWikiPluginRegistry {
 	once.Do(func() {
 		instance = &goWikiPluginRegistry{
-			plugins: make(map[string]modules.Module),
+			plugins: make(map[string]GoWikiModule),
 		}
 	})
 	return instance
 }
 
-func (gr goWikiPluginRegistry) Add(name string, pluginInterface modules.Module) {
+func (gr goWikiPluginRegistry) Add(name string, pluginInterface GoWikiModule) {
 	log.Println(fmt.Sprintf("Loading plugin: %s (%s)", name, pluginInterface.Version()))
 
 	gr.plugins[name] = pluginInterface
@@ -70,7 +76,7 @@ func LoadPlugins() {
 		// dereference
 		mod := *modPtr
 
-		module, ok := mod().(modules.Module)
+		module, ok := mod().(GoWikiModule)
 		if !ok {
 			log.Fatal(fmt.Sprintf("error: converting: %T\n", modObj))
 		}
