@@ -9,6 +9,7 @@ import (
 	"sync"
 	"log"
 	"github.com/gin-gonic/gin"
+	"reflect"
 )
 
 type goWikiPluginRegistry struct {
@@ -18,7 +19,7 @@ type goWikiPluginRegistry struct {
 var instance *goWikiPluginRegistry
 var once sync.Once
 
-func GetInstance() *goWikiPluginRegistry {
+func GetPluginRegistry() *goWikiPluginRegistry {
 	once.Do(func() {
 		instance = &goWikiPluginRegistry{
 			plugins: make(map[string]plugins.GoWikiPlugin),
@@ -57,7 +58,11 @@ func LoadPlugins() {
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(reflect.TypeOf(f))
 
-		GetInstance().Add(filename, f.(plugins.GoWikiPlugin))
+		plug := f.(func() plugins.GoWikiPlugin)()
+		fmt.Println(plug)
+
+		GetPluginRegistry().Add(filename, plug)
 	}
 }
