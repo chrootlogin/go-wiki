@@ -6,12 +6,14 @@ import (
 	"plugin"
 	"log"
 	"sync"
+
+	"github.com/chrootlogin/go-wiki/src/lib/event"
 )
 
 // Module is the interface implemented by types that
 // register themselves as modular plug-ins.
 type GoWikiModule interface {
-	Init() error
+	Init(*event.GoWikiEvents) error
 	Version() string
 }
 
@@ -38,12 +40,6 @@ func (gr goWikiPluginRegistry) Add(name string, pluginInterface GoWikiModule) {
 
 	pluginInterface.Init()
 }
-/*
-func (gr goWikiPluginRegistry) RunEngine(engine *gin.Engine) {
-	for _, v := range gr.plugins {
-		v.RunEngine(engine)
-	}
-}*/
 
 func LoadPlugins() {
 	log.Println("Starting plugins...")
@@ -56,21 +52,21 @@ func LoadPlugins() {
 	for _, filename := range (all_plugins) {
 		p, err := plugin.Open(filename)
 		if err != nil {
-			log.Fatal(fmt.Sprintf("error: failed to load plugin: %v\n", err))
+			log.Fatal(fmt.Sprintf("error: failed to load plugin: %v", err))
 		}
 
 		modObj, err := p.Lookup("Plugin")
 		if err != nil {
-			log.Fatal(fmt.Sprintf("error: failed to lookup type map: %v\n", err))
+			log.Fatal(fmt.Sprintf("error: failed to lookup type map: %v", err))
 		}
 
 		modPtr, tmapOk := modObj.(*func() interface{})
 		if !tmapOk {
-			log.Fatal(fmt.Sprintf("error: invalid type map: %T\n", modObj))
+			log.Fatal(fmt.Sprintf("error: invalid type map: %T", modObj))
 		}
 
 		if modPtr == nil {
-			log.Fatal(fmt.Sprintf("error: nil type map: type=%[1]T val=%[1]v\n", modPtr))
+			log.Fatal(fmt.Sprintf("error: nil type map: type=%[1]T val=%[1]v", modPtr))
 		}
 
 		// dereference
@@ -78,7 +74,7 @@ func LoadPlugins() {
 
 		module, ok := mod().(GoWikiModule)
 		if !ok {
-			log.Fatal(fmt.Sprintf("error: converting: %T\n", modObj))
+			log.Fatal(fmt.Sprintf("error: converting: %T", modObj))
 		}
 
 		GetPluginRegistry().Add(filename, module)
