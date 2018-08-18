@@ -1,17 +1,13 @@
 package common
 
 import (
-	"github.com/gin-gonic/gin"
-	"path/filepath"
 	"fmt"
 	"plugin"
+
+	"path/filepath"
 )
 
-type GoWikiPlugin interface {
-	Run(e *gin.Engine)
-}
-
-func LoadPlugins(e *gin.Engine) {
+func LoadPlugins() {
 	all_plugins, err := filepath.Glob("plugins/*.so")
 	if err != nil {
 		panic(err)

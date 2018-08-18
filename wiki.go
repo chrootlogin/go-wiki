@@ -3,13 +3,15 @@ package main
 import (
 	"os"
 	"log"
-		"github.com/gin-gonic/gin"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
-		"github.com/chrootlogin/go-wiki/src/user"
+	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/plugins"
 )
 
 var port = ""
@@ -29,17 +31,15 @@ func main() {
 func initRouter() {
 	router := gin.Default()
 
+	// Load Engine into plugins API
+	plugins.API.SetEngine(router)
+
 	// Allow cors
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AddAllowHeaders("Authorization", "*")
 	corsConfig.AddAllowMethods("HEAD", "GET", "POST", "PUT", "DELETE")
 	router.Use(cors.New(corsConfig))
-
-	// public routes
-	//router.GET("/", frontend.GetFrontendIndexHandler)
-	//router.GET("/assets/*path", frontend.GetFrontendHandler)
-
 
 	// authentication
 	am := auth.GetAuthMiddleware()
@@ -57,7 +57,7 @@ func initRouter() {
 		api.POST("/preview", page.PostPreviewHandler)
 	}
 
-	common.LoadPlugins(router)
+	common.LoadPlugins()
 
 	router.Run(":" + port)
 }
