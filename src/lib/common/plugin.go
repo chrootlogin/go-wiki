@@ -1,18 +1,14 @@
 package common
 
 import (
+	"path/filepath"
 	"fmt"
 	"plugin"
-
-	"path/filepath"
-	"github.com/chrootlogin/go-wiki/src/lib/plugins"
-	"sync"
 	"log"
-	"github.com/gin-gonic/gin"
-	"reflect"
+	"github.com/chrootlogin/go-wiki/src/lib/modules"
 )
 
-type goWikiPluginRegistry struct {
+/*type goWikiPluginRegistry struct {
 	plugins map[string]plugins.GoWikiPlugin
 }
 
@@ -38,31 +34,53 @@ func (gr goWikiPluginRegistry) RunEngine(engine *gin.Engine) {
 	for _, v := range gr.plugins {
 		v.RunEngine(engine)
 	}
-}
+}*/
 
 func LoadPlugins() {
-	all_plugins, err := filepath.Glob("plugins/*.so")
+	all_plugins, err := filepath.Glob("modules/*.so")
 	if err != nil {
 		panic(err)
 	}
 
 	for _, filename := range (all_plugins) {
-		fmt.Println("Filename: " + filename)
-
 		p, err := plugin.Open(filename)
 		if err != nil {
-			panic(err)
+			log.Fatal(fmt.Sprintf("error: failed to load plugin: %v\n", err))
 		}
 
-		f, err := p.Lookup("GetPlugin")
+		tmapObj, err := p.Lookup("Types")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("error: failed to lookup type map: %v\n", err))
+		}
+
+		// assert that the Types symbol is a *map[string]func() interface{}
+		tmapPtr, tmapOk := tmapObj.(*map[string]func() interface{})
+		if !tmapOk {
+			log.Fatal(fmt.Sprintf("error: invalid type map: %T\n", tmapObj))
+		}
+
+		// assert that the type map pointer is not nil
+		if tmapPtr == nil {
+			log.Fatal(fmt.Sprintf("error: nil type map: type=%[1]T val=%[1]v\n", tmapPtr))
+		}
+
+		// dereference the type map pointer
+		tmap := *tmapPtr
+
+		// register the plug-in's modules
+		for k, v := range tmap {
+			modules.RegisterModule(k, v)
+		}
+
+		/*f, err := p.Lookup("GetPlugin")
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(reflect.TypeOf(f))
 
-		plug := f.(func() plugins.GoWikiPlugin)()
+		/*plug := f.(func() plugins.GoWikiPlugin)()
 		fmt.Println(plug)
 
-		GetPluginRegistry().Add(filename, plug)
+		GetPluginRegistry().Add(filename, plug)*/
 	}
 }

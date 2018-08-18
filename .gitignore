@@ -4,7 +4,7 @@ data/
 /plugins/
 go-wiki
 
-# Created by .ignore support plugins (hsz.mobi)
+# Created by .ignore support modules (hsz.mobi)
 ### Linux template
 *~
 
@@ -20,7 +20,7 @@ go-wiki
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 ### Go template
-# Binaries for programs and plugins
+# Binaries for programs and modules
 *.exe
 *.exe~
 *.dll
@@ -193,7 +193,7 @@ $RECYCLE.BIN/
 # CMake
 cmake-build-*/
 
-# Mongo Explorer plugins
+# Mongo Explorer modules
 .idea/**/mongoSettings.xml
 
 # File-based project format
@@ -202,16 +202,16 @@ cmake-build-*/
 # IntelliJ
 out/
 
-# mpeltonen/sbt-idea plugins
+# mpeltonen/sbt-idea modules
 .idea_modules/
 
-# JIRA plugins
+# JIRA modules
 atlassian-ide-plugin.xml
 
-# Cursive Clojure plugins
+# Cursive Clojure modules
 .idea/replstate.xml
 
-# Crashlytics plugins (for Android Studio and IntelliJ)
+# Crashlytics modules (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
