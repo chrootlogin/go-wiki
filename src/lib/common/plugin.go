@@ -6,10 +6,12 @@ import (
 	"plugin"
 	"log"
 	"github.com/chrootlogin/go-wiki/src/lib/modules"
+	"sync"
+	"reflect"
 )
 
-/*type goWikiPluginRegistry struct {
-	plugins map[string]plugins.GoWikiPlugin
+type goWikiPluginRegistry struct {
+	plugins map[string]modules.Module
 }
 
 var instance *goWikiPluginRegistry
@@ -18,18 +20,20 @@ var once sync.Once
 func GetPluginRegistry() *goWikiPluginRegistry {
 	once.Do(func() {
 		instance = &goWikiPluginRegistry{
-			plugins: make(map[string]plugins.GoWikiPlugin),
+			plugins: make(map[string]modules.Module),
 		}
 	})
 	return instance
 }
 
-func (gr goWikiPluginRegistry) Add(name string, pluginInterface plugins.GoWikiPlugin) {
-	log.Println(fmt.Sprintf("Plugin %s (%s) was loaded!", name, pluginInterface.Version()))
+func (gr goWikiPluginRegistry) Add(name string, pluginInterface *modules.Module) {
+	module := *pluginInterface
 
-	gr.plugins[name] = pluginInterface
+	log.Println(fmt.Sprintf("Plugin %s (%s) was loaded!", name, module.Version()))
+
+	gr.plugins[name] = module
 }
-
+/*
 func (gr goWikiPluginRegistry) RunEngine(engine *gin.Engine) {
 	for _, v := range gr.plugins {
 		v.RunEngine(engine)
@@ -37,7 +41,6 @@ func (gr goWikiPluginRegistry) RunEngine(engine *gin.Engine) {
 }*/
 
 func LoadPlugins() {
-
 	fmt.Println("Loading plugins...")
 	all_plugins, err := filepath.Glob("plugins/*.so")
 	if err != nil {
@@ -50,12 +53,38 @@ func LoadPlugins() {
 			log.Fatal(fmt.Sprintf("error: failed to load plugin: %v\n", err))
 		}
 
-		fmt.Println(p)
+		modObj, err := p.Lookup("GetModule")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("error: failed to lookup module: %v\n", err))
+		}
 
-		tmapObj, err := p.Lookup("Types")
+		fmt.Println(reflect.TypeOf(modObj))
+
+		mod := modObj.(func() interface{})()
+		if mod == nil {
+			log.Fatal(fmt.Sprintf("error: nil module: type=%[1]T val=%[1]v\n", mod))
+		}
+
+		fmt.Println(reflect.TypeOf(mod))
+
+		// dereference
+		//mod := modPtr
+
+		obj := mod.(modules.Module)
+		/*if !ok {
+			log.Fatal(fmt.Sprintf("error: cannot convert module: %T\n", mod))
+		}*/
+
+		//GetPluginRegistry().Add(filename, obj)
+
+
+		fmt.Println(obj)
+
+		/*tmapObj, err := p.Lookup("Types")
 		if err != nil {
 			log.Fatal(fmt.Sprintf("error: failed to lookup type map: %v\n", err))
 		}
+
 
 		fmt.Println(tmapObj)
 

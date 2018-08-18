@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"fmt"
+	"github.com/coreos/go-semver/semver"
 )
 
 // Module is the interface implemented by types that
@@ -15,6 +16,8 @@ type Module interface {
 	// The config argument can be asserted as an implementation of the
 	// of the github.com/akutz/gpds/lib/v2.Config interface or older.
 	Init(ctx context.Context, config interface{}) error
+
+	Version() *semver.Version
 }
 
 var mods = map[string]func() interface{}{}
