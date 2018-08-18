@@ -16,8 +16,6 @@ func GetInstance() *GoWikiPluginAPI {
 	return instance
 }
 
-func RegisterPlugin(name string) GoWikiPluginAPIInterface {
-	log.Println(fmt.Sprintf("Plugin %s was loaded!", name))
-
-	return GetInstance()
+func RegisterPlugin(name string, pluginInterface GoWikiPlugin) {
+	log.Println(fmt.Sprintf("Plugin %s (%s) was loaded!", name, pluginInterface.Version()))
 }
