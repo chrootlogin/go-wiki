@@ -32,7 +32,7 @@ func initRouter() {
 	router := gin.Default()
 
 	// Load Engine into plugins API
-	plugins.API.SetEngine(router)
+	plugins.GetInstance().SetEngine(router)
 
 	// Allow cors
 	corsConfig := cors.DefaultConfig()
