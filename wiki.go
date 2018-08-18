@@ -11,7 +11,6 @@ import (
 	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/plugins"
 )
 
 var port = ""
@@ -24,15 +23,13 @@ func main() {
 	}
 
 	log.Println("Starting go-wiki.")
+	common.LoadPlugins()
 	initRouter()
 	log.Println("go-wiki is running.")
 }
 
 func initRouter() {
 	router := gin.Default()
-
-	// Load Engine into plugins API
-	plugins.GetInstance()
 
 	// Allow cors
 	corsConfig := cors.DefaultConfig()
@@ -57,7 +54,7 @@ func initRouter() {
 		api.POST("/preview", page.PostPreviewHandler)
 	}
 
-	common.LoadPlugins()
+	common.GetInstance().RunEngine(router)
 
 	router.Run(":" + port)
 }
