@@ -1,4 +1,4 @@
-package common
+package plugins
 
 import (
 	"fmt"
@@ -6,13 +6,14 @@ import (
 	"github.com/hashicorp/go-plugin"
 	"os/exec"
 	"github.com/chrootlogin/go-wiki-plugin-sdk"
+	"github.com/gin-gonic/gin"
 )
 
 var pluginMap = map[string]plugin.Plugin{
 	"extension": &module.GoWikiPlugin{},
 }
 
-func LoadPlugins() {
+func Load(engine *gin.Engine) {
 	log.Println("Starting plugins...")
 
 
@@ -27,7 +28,7 @@ func LoadPlugins() {
 			HandshakeConfig: module.HandshakeConfig,
 			Cmd:             exec.Command(filename),
 		})
-		defer client.Kill()
+		//defer client.Kill()
 
 		rpcClient, err := client.Client()
 		if err != nil {
@@ -40,6 +41,23 @@ func LoadPlugins() {
 		}
 
 		extension := ext.(module.IGoWikiPlugin)
+
+		// Add to registry
+		Registry().Add(extension.Name(), client, extension)
 		log.Println(fmt.Sprintf("Plugin %s (%s) was loaded!", extension.Name(), extension.Version()))
+
+		for _, route := range extension.Routes() {
+
+			r := route
+			var routingFunc = func(c *gin.Context) {
+				var httpRequest = module.HTTPRequest{
+					URL: *c.Request.URL,
+				}
+
+				c.String(200, extension.HandleRoute(r, httpRequest))
+			}
+
+			engine.GET(route, routingFunc)
+		}
 	}
 }

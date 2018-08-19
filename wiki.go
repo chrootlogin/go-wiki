@@ -10,8 +10,11 @@ import (
 	"github.com/chrootlogin/go-wiki/src/page"
 	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
-	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/event"
+	"github.com/chrootlogin/go-wiki/src/lib/plugins"
+	"os/signal"
+	"syscall"
+	"fmt"
 )
 
 var port = ""
@@ -24,13 +27,15 @@ func main() {
 	}
 
 	log.Println("Starting go-wiki.")
-	common.LoadPlugins()
+
 	initRouter()
 	log.Println("go-wiki is running.")
 }
 
 func initRouter() {
 	router := gin.Default()
+
+	plugins.Load(router)
 
 	// Allow cors
 	corsConfig := cors.DefaultConfig()
@@ -58,6 +63,21 @@ func initRouter() {
 	//common.GetPluginRegistry().RunEngine(router)
 
 	event.Events().Emit("init-router", router)
+
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		sig := <-gracefulStop
+		log.Println(fmt.Sprintf("+++++ Caught sig: %+v", sig))
+
+		for name, ext := range plugins.Registry().Clients() {
+			log.Println(fmt.Sprintf("Stopping plugin: %s", name))
+			ext.Kill()
+		}
+
+		os.Exit(0)
+	}()
 
 	router.Run(":" + port)
 }
