@@ -11,6 +11,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/event"
 )
 
 var port = ""
@@ -55,6 +56,8 @@ func initRouter() {
 	}
 
 	//common.GetPluginRegistry().RunEngine(router)
+
+	event.Events().Emit("init-router", router)
 
 	router.Run(":" + port)
 }
