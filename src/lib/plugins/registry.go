@@ -46,7 +46,8 @@ func (r *pluginRegistry) RegisterRoutes(engine *gin.Engine) {
 					URL: c.Request.URL,
 				}
 
-				c.String(200, ext.Plugin.HandleRoute(r, httpRequest))
+				resp := ext.Plugin.HandleRoute(r, httpRequest)
+				handleResponse(resp, c)
 			}
 
 			engine.GET(route, routingFunc)
@@ -62,4 +63,12 @@ func (r *pluginRegistry) Clients() map[string]*plugin.Client {
 	}
 
 	return ret
+}
+
+func handleResponse(response module.HTTPResponse, c *gin.Context) {
+	for k, v := range response.Headers {
+		c.Header(k, v)
+	}
+
+	c.String(response.Status, response.Body)
 }
