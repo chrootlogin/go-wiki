@@ -27,15 +27,14 @@ func main() {
 	}
 
 	log.Println("Starting go-wiki.")
-
+	plugins.Load()
 	initRouter()
 	log.Println("go-wiki is running.")
+	enableGracefullStop()
 }
 
 func initRouter() {
 	router := gin.Default()
-
-	plugins.Load(router)
 
 	// Allow cors
 	corsConfig := cors.DefaultConfig()
@@ -60,10 +59,14 @@ func initRouter() {
 		api.POST("/preview", page.PostPreviewHandler)
 	}
 
-	//common.GetPluginRegistry().RunEngine(router)
+	plugins.Registry().RegisterRoutes(router)
 
 	event.Events().Emit("init-router", router)
 
+	router.Run(":" + port)
+}
+
+func enableGracefullStop() {
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
@@ -78,6 +81,4 @@ func initRouter() {
 
 		os.Exit(0)
 	}()
-
-	router.Run(":" + port)
 }

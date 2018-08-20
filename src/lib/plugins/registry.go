@@ -5,6 +5,7 @@ import (
 
 	"github.com/chrootlogin/go-wiki-plugin-sdk"
 	"github.com/hashicorp/go-plugin"
+	"github.com/gin-gonic/gin"
 )
 
 var registry *pluginRegistry
@@ -33,6 +34,23 @@ func (r *pluginRegistry) Add(name string, client *plugin.Client, extension modul
 	r.extensions[name] = Extension{
 		Client: client,
 		Plugin: extension,
+	}
+}
+
+func (r *pluginRegistry) RegisterRoutes(engine *gin.Engine) {
+	for _, ext := range r.extensions {
+		for _, route := range ext.Plugin.Routes() {
+			r := route
+			var routingFunc = func(c *gin.Context) {
+				var httpRequest = module.HTTPRequest{
+					URL: c.Request.URL,
+				}
+
+				c.String(200, ext.Plugin.HandleRoute(r, httpRequest))
+			}
+
+			engine.GET(route, routingFunc)
+		}
 	}
 }
 

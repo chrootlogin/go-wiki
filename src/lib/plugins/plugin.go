@@ -6,14 +6,13 @@ import (
 	"github.com/hashicorp/go-plugin"
 	"os/exec"
 	"github.com/chrootlogin/go-wiki-plugin-sdk"
-	"github.com/gin-gonic/gin"
-)
+	)
 
 var pluginMap = map[string]plugin.Plugin{
-	"extension": &module.GoWikiPlugin{},
+	"extension": &module.GoWikiPluginConnector{},
 }
 
-func Load(engine *gin.Engine) {
+func Load() {
 	log.Println("Starting plugins...")
 
 
@@ -28,7 +27,6 @@ func Load(engine *gin.Engine) {
 			HandshakeConfig: module.HandshakeConfig,
 			Cmd:             exec.Command(filename),
 		})
-		//defer client.Kill()
 
 		rpcClient, err := client.Client()
 		if err != nil {
@@ -44,20 +42,8 @@ func Load(engine *gin.Engine) {
 
 		// Add to registry
 		Registry().Add(extension.Name(), client, extension)
-		log.Println(fmt.Sprintf("Plugin %s (%s) was loaded!", extension.Name(), extension.Version()))
+		log.Println(fmt.Sprintf("Loading plugin: %s (%s)", extension.Name(), extension.Version()))
 
-		for _, route := range extension.Routes() {
-
-			r := route
-			var routingFunc = func(c *gin.Context) {
-				var httpRequest = module.HTTPRequest{
-					URL: *c.Request.URL,
-				}
-
-				c.String(200, extension.HandleRoute(r, httpRequest))
-			}
-
-			engine.GET(route, routingFunc)
-		}
+		extension.Init()
 	}
 }
