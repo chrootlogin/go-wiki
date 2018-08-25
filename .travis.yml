@@ -1,3 +1,8 @@
+env:
+  global:
+  - secure: FlsY+2fqQpbu1HfQx8cJFdE2Ln5ACYBzO8a73RPcE/buInTtg6Q6ZTakaHVg8jHADc7LWBKam2NF5M18wMvHxY81yLE6B7s2Chdc+tqwrHlc3xwXf5jceN2KShc9fyP7wyEV3Y71fQYPLsA/7pxbId7VtsuQwOL0HyYtH6eLJs2P5uUftYJBu6dWiixsSjiPx6BdlibVqoNyJic+YUgbJOUpa+zMQfBvsN8pqyTTYym3M7YjB6lyXawWLM8A5W1F+1sWstsm9aUiEpGHWem9PoeHufWkGExtMBhXTK+/N1E1hJ2v9cav/iF2GOtk0NkryFuqNK0Im2x3nBWf1K2FPBn3oRf+dJshSRqRz1H7NY3zPJsJjcj4//MYfDqvrlsNIE3QQOeE9yb+Q9bG8C5H0cQ1rdQChnVQoQivJVnhjb0aTCOg/548I89hg+6xqpUlO+sDfx0STz1xEB+Jtunj/LYmAsj7F6DoZziepf1KqzdDfk+DCJyt/vqlvy9vKS3OwAY40a4/XIvJWM23BQWeReL/UHLYkYvUMxQM37Nblj1AeyRcW8V0gGyzNcNGwKuDSxIRdrEy0DX8qSrXLrj+wOJmEtZYCKAxxn+zW1uU0GFYJhe9hYbChrNGSAbOJXBsw7gQaTU1et1DayIWqJGj/v58LmTcQz32sQxL1W1O0cM=
+  - secure: PkkW6Cst8FMhmQk5TyxuMwZwzFOIFh7FtbVF8wCPbBiBXpInxaCMoiDddmG1ntLYFKNyazRIunRJAZwD9OdGF0KOj/OFqb3Cpu7AWbQYT1y7E4MCe91Roa6l7Co50BfeZc/0JhFGZ/34M23xzREtL3wf0xH1K+OYTwiYR/Ge+MVGPcrCMZ8SG5giPQJD/gP/X9EKrS9OQHzIA6YQTplQoTMGxFtPPhnxgqyeikueyGwgCTzWyodOBL/pC808HRPIX3Kddw/xLTjOPUOGu5yt1ByeqbX2h3G5kcngO3lKXJ0uay6wchHuCgbNeXPK1hY/qijdh3PzAC6o1ajw2lm/QFLv4A4+ItAepD9jRJiHUJm+Bx70EXBysYQ7wAW8JS2jlIaaT58fkP+Uj7t/1uLFZqiC7zX++8k7HjY8Zno7xVGlo4QgW9C5EZO8yU7NfVAUjQlcsukOzZleqWwFNmstFOuubXw5YSHE4eRQJkdQ3NbKW4RV1OYolVEug+PWNM8Dd10r1N7DrI58x99ABpjODbi1+NCANfOeoVmdntbzH63kG2encx6erCfDdRJbVi5wTbIXobLKDHM4yvdxljieWl0gcAr5SZqIFq+WnYShqTNn1M1z4U9F6+WF4qlKhYDc/nghB4VQHVebEOTcM4mys7MwKYaVfQKaud4Mh7vcxtg=
+
 jobs:
   include:
   - language: go
@@ -17,3 +22,16 @@ jobs:
 
     script:
     - make
+
+    deploy:
+    - provider: script
+      script: curl -T "go-wiki" -u "$BINTRAY_USER:$BINTRAY_API_KEY" -H "X-Bintray-Publish:1" -H "X-Bintray-Package:linux" -H "X-Bintray-Version:latest-$(date +%Y-%m-%d)" -H "X-Bintray-Override:1" "https://api.bintray.com/content/rootlogin/go-wiki/latest-$(date +%Y-%m-%d)/go-wiki"
+      skip_cleanup: true
+      on:
+        branch: master
+
+    - provider: script
+      script: curl -T "go-wiki" -u "$BINTRAY_USER:$BINTRAY_API_KEY" -H "X-Bintray-Publish:1" -H "X-Bintray-Package:linux" -H "X-Bintray-Version:$TRAVIS_TAG" -H "X-Bintray-Override:1" "https://api.bintray.com/content/rootlogin/go-wiki/$TRAVIS_TAG/go-wiki"
+      skip_cleanup: true
+      on:
+        tags: true
