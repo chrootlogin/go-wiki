@@ -13,6 +13,7 @@ import (
 
 var (
 	ErrIsDir = errors.New("Is a directory.")
+	ErrIsFile = errors.New("Is a file.")
 )
 
 type File struct {
@@ -79,6 +80,25 @@ func (fs *filesystem) Has(path string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (fs *filesystem) List(path string) ([]os.FileInfo, error) {
+	// check for error
+	if fs.Error != nil {
+		return []os.FileInfo{}, fs.Error
+	}
+
+	// check if is a dir
+	fileinfo, err := fs.Filesystem.Stat(path)
+	if err != nil {
+		return []os.FileInfo{}, err
+	}
+
+	if !fileinfo.IsDir() {
+		return []os.FileInfo{}, ErrIsFile
+	}
+
+	return fs.Filesystem.ReadDir(path)
 }
 
 func (fs *filesystem) Get(path string) (*File, error) {

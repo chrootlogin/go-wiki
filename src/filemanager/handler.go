@@ -1,0 +1,71 @@
+package filemanager
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"time"
+	"os"
+)
+
+type apiResponse struct {
+	Files []fileResponse `json:"files"`
+	Path  string		 `json:"path"`
+}
+
+type fileResponse struct {
+	Name    string `json:"name"`
+	Size    int64  `json:"size"`
+	ModTime string `json:"modtime"`
+	Type    string `json:"string"`
+}
+
+// READ
+func ListFolderHandler(c *gin.Context) {
+	path := c.Param("path")
+
+	// Init Filesystem
+	fs := filesystem.New(filesystem.WithChroot("pages"))
+
+	dirContent, err := fs.List(path)
+	if err != nil {
+		if err == filesystem.ErrIsFile {
+			c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{ Message: fmt.Sprintf("Path '%s' is not a directory!", path)})
+			return
+		}
+
+		if os.IsNotExist(err) {
+			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{ Message: fmt.Sprintf("Path '%s' not found!", path)})
+			return
+		}
+
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		return
+	}
+
+	var files []fileResponse
+	for _, file := range dirContent {
+		f := fileResponse{
+			Name: file.Name(),
+			Size: file.Size(),
+			ModTime: file.ModTime().Format(time.RFC1123),
+		}
+
+		if file.IsDir() {
+			f.Type = "directory"
+		} else {
+			f.Type = "file"
+		}
+
+		files = append(files, f)
+	}
+
+	c.JSON(200, apiResponse{
+		Files: files,
+		Path: path,
+	})
+}

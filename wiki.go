@@ -2,19 +2,20 @@ package main
 
 import (
 	"os"
+	"fmt"
 	"log"
+	"syscall"
+	"os/signal"
 
+	"github.com/chrootlogin/event"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 
 	"github.com/chrootlogin/go-wiki/src/page"
 	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
-	"github.com/chrootlogin/event"
 	"github.com/chrootlogin/go-wiki/src/lib/plugins"
-	"os/signal"
-	"syscall"
-	"fmt"
+	"github.com/chrootlogin/go-wiki/src/filemanager"
 )
 
 var port = ""
@@ -53,6 +54,8 @@ func initRouter() {
 	api := router.Group("/api/")
 	api.Use(am.MiddlewareFunc())
 	{
+		api.GET("/list/*path", filemanager.ListFolderHandler)
+
 		api.GET("/page/*path", page.GetPageHandler)
 		api.POST("/page/*path", page.PostPageHandler)
 		api.PUT("/page/*path", page.PutPageHandler)
