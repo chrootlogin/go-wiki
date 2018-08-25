@@ -10,12 +10,12 @@
   revision = "0755fe2dc241caebab64327c352006712f6a55c4"
 
 [[projects]]
-  branch = "master"
-  digest = "1:9bbfd75594b372778e95384db3afd45de9d4053441d3a83cf72e7987eab2916f"
+  digest = "1:6ae3bf65cb49c7c570b776f053b908421e83aaeae05946e073bc8afe928606ca"
   name = "github.com/chrootlogin/event"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f7777f3a95794b0086e22199731bf5d3cadc68f4"
+  revision = "7423c34e78f0365422248bbc66e9052648ae9e7e"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"

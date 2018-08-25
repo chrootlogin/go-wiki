@@ -61,12 +61,8 @@
   version = "2.1.0"
 
 [[constraint]]
-  name = "github.com/coreos/go-semver"
-  version = "0.2.0"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/chrootlogin/event"
+  version = "1.0.0"
 
 [[constraint]]
   branch = "master"
