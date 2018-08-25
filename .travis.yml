@@ -1,0 +1,19 @@
+jobs:
+  include:
+  - language: go
+    go: 1.10.x
+    node_js: lts/*
+
+    cache:
+      directories:
+      - vendor
+
+    before_script:
+    - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    - go get -u github.com/go-bindata/go-bindata/...
+
+    install:
+    - # skip
+
+    script:
+    - make
