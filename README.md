@@ -4,11 +4,22 @@
 
 A wiki software written in Go.
 
-## Usage
+## Download
+
+* **Linux**: https://bintray.com/rootlogin/go-wiki/linux
+* **Docker**: https://hub.docker.com/r/rootlogin/go-wiki/
+
+### Usage
 
 The easiest way to run go-wiki is with docker:
 ```
 $ docker run -p 80:8000 -e SESSION_KEY=AVerySecureString rootlogin/go-wiki
+```
+
+But you can also download Go-Wiki and run it:
+```
+$ chmod +x ./go-wiki
+$ SESSION_KEY=a-very-secret-key ./go-wiki
 ```
 
 ### Environment variables
