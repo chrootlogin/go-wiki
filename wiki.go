@@ -28,6 +28,7 @@ func main() {
 
 	log.Println("Starting go-wiki.")
 	plugins.Load()
+	registerEvents()
 	initRouter()
 	log.Println("go-wiki is running.")
 	enableGracefullStop()
@@ -59,11 +60,20 @@ func initRouter() {
 		api.POST("/preview", page.PostPreviewHandler)
 	}
 
-	plugins.Registry().RegisterRoutes(router)
-
 	event.Events().Emit("init-router", router)
 
 	router.Run(":" + port)
+}
+
+func registerEvents() {
+	event.Events().On("init-router", func(input ...interface{}) {
+		router, ok := input[0].(*gin.Engine)
+		if !ok {
+			log.Fatal("Can't convert input to gin.Engine.")
+		}
+
+		plugins.Registry().RegisterRoutes(router)
+	})
 }
 
 func enableGracefullStop() {

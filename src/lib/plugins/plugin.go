@@ -3,10 +3,12 @@ package plugins
 import (
 	"fmt"
 	"log"
-	"github.com/hashicorp/go-plugin"
 	"os/exec"
+
+	"github.com/hashicorp/go-plugin"
+
 	"github.com/chrootlogin/go-wiki-plugin-sdk"
-	)
+)
 
 var pluginMap = map[string]plugin.Plugin{
 	"extension": &module.GoWikiPluginConnector{},

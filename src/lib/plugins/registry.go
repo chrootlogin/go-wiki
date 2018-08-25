@@ -3,9 +3,10 @@ package plugins
 import (
 	"sync"
 
-	"github.com/chrootlogin/go-wiki-plugin-sdk"
 	"github.com/hashicorp/go-plugin"
 	"github.com/gin-gonic/gin"
+
+	"github.com/chrootlogin/go-wiki-plugin-sdk"
 )
 
 var registry *pluginRegistry
