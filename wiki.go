@@ -55,6 +55,7 @@ func initRouter() {
 	api.Use(am.MiddlewareFunc())
 	{
 		api.GET("/list/*path", filemanager.ListFolderHandler)
+		api.POST("/raw/*path", filemanager.PostFileHandler)
 
 		api.GET("/page/*path", page.GetPageHandler)
 		api.POST("/page/*path", page.PostPageHandler)
