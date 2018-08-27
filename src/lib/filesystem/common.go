@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	ErrIsDir = errors.New("Is a directory.")
-	ErrIsFile = errors.New("Is a file.")
+	ErrIsDir = errors.New("is a directory")
+	ErrIsFile = errors.New("is a file")
 )
 
 type File struct {
