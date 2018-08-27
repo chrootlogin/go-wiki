@@ -14,6 +14,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/page"
 	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
+	"github.com/chrootlogin/go-wiki/src/config"
 	"github.com/chrootlogin/go-wiki/src/lib/plugins"
 	"github.com/chrootlogin/go-wiki/src/filemanager"
 )
@@ -54,6 +55,8 @@ func initRouter() {
 	api := router.Group("/api/")
 	api.Use(am.MiddlewareFunc())
 	{
+		api.GET("/config", config.GetConfigHandler)
+
 		api.GET("/list/*path", filemanager.ListFolderHandler)
 		api.POST("/raw/*path", filemanager.PostFileHandler)
 

@@ -22,3 +22,7 @@ type Page struct {
 	Content  string			   `json:"content"`
 	Metadata map[string]string `json:"metadata"`
 }
+
+type Configuration struct {
+	Registration bool `json:"registration"`
+}
