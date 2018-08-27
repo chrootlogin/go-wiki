@@ -12,6 +12,8 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/auth"
+	"github.com/chrootlogin/go-wiki/src/lib/store"
+	"github.com/chrootlogin/go-wiki/src/lib/helper"
 )
 
 type ApiRequest struct {
@@ -21,8 +23,13 @@ type ApiRequest struct {
 }
 
 func RegisterHandler(c *gin.Context) {
-	var data ApiRequest
+	// check if registration is enabled
+	if !store.GetConfig().Registration {
+		helper.Forbidden("Registration is disabled!", c)
+		return
+	}
 
+	var data ApiRequest
 	if c.BindJSON(&data) == nil {
 		userList, err := auth.GetUserList()
 		if err != nil {
