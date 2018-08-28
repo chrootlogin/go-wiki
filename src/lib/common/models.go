@@ -24,5 +24,6 @@ type Page struct {
 }
 
 type Configuration struct {
-	Registration bool `json:"registration"`
+	Title        string `json:"title"`
+	Registration bool   `json:"registration"`
 }
