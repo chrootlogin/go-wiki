@@ -12,6 +12,8 @@ import (
 	"gopkg.in/dgrijalva/jwt-go.v3"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/store"
+	"github.com/chrootlogin/go-wiki/src/lib/helper"
 )
 
 type AuthMiddleware struct {
@@ -72,7 +74,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			userId := claims["id"].(string)
 
 			// check database
-			userList, err := GetUserList()
+			userList, err := store.GetUserList()
 			if err != nil {
 				log.Println("Error loading users: " + err.Error())
 				c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
@@ -118,7 +120,7 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	userList, err := GetUserList()
+	userList, err := store.GetUserList()
 	if err != nil {
 		log.Println("Error loading users: " + err.Error())
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
@@ -133,7 +135,7 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 		log.Println(err.Error())
 	}
 
-	if !CheckPasswordHash(loginData.Password, user.PasswordHash) {
+	if !helper.CheckPasswordHash(loginData.Password, user.PasswordHash) {
 		loginIsError = true
 	}
 

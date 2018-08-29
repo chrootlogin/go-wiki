@@ -1,15 +1,15 @@
-package auth
+package store
 
 import (
+	"errors"
 	"fmt"
 	"log"
-	"errors"
 	"encoding/json"
 
 	"github.com/patrickmn/go-cache"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+    "github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
 type UserList struct {
@@ -50,13 +50,13 @@ func (u *UserList) Add(user common.User) error {
 	}
 
 	// remove users from cache
-	authCache.Delete("users")
+	storeCache.Delete("users")
 	return nil
 }
 
 func GetUserList() (*UserList, error) {
 	// check if users are in cache
-	cachedUsers, found := authCache.Get("users")
+	cachedUsers, found := storeCache.Get("users")
 	if found {
 		ul := &UserList{
 			Users: cachedUsers.(map[string]common.User),
@@ -80,7 +80,7 @@ func GetUserList() (*UserList, error) {
 	}
 
 	// add to cache with no expiration
-	authCache.Set("users", users, cache.NoExpiration)
+	storeCache.Set("users", users, cache.NoExpiration)
 
 	var ul = &UserList{
 		Users: users,

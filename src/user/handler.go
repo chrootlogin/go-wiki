@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/auth"
 	"github.com/chrootlogin/go-wiki/src/lib/store"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 )
@@ -31,7 +30,7 @@ func RegisterHandler(c *gin.Context) {
 
 	var data ApiRequest
 	if c.BindJSON(&data) == nil {
-		userList, err := auth.GetUserList()
+		userList, err := store.GetUserList()
 		if err != nil {
 			log.Println("Error loading users: " + err.Error())
 			c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
@@ -43,7 +42,7 @@ func RegisterHandler(c *gin.Context) {
 			return
 		}
 
-		passwordHash, err := auth.HashPassword(data.Password)
+		passwordHash, err := helper.HashPassword(data.Password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
@@ -69,7 +68,7 @@ func RegisterHandler(c *gin.Context) {
 	}
 }
 
-func validateNewUser(ul *auth.UserList, name string, password string, email string) error {
+func validateNewUser(ul *store.UserList, name string, password string, email string) error {
 	if len(name) <= 3 {
 		return errors.New("Username must be at least 3 chars.")
 	}

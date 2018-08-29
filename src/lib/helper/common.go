@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Unauthorized(c *gin.Context) {
@@ -15,4 +16,16 @@ func Unauthorized(c *gin.Context) {
 
 func Forbidden(message string, c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusForbidden, common.ApiResponse{Message: message})
+}
+
+// Hash a password with bcrypt
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+// Check a password hash
+func CheckPasswordHash(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
