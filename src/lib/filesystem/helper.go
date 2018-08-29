@@ -46,7 +46,7 @@ func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
 	return data, fileinfo, nil
 }
 
-func commitFile(fs *filesystem, path string, data []byte, commit Commit) error {
+func saveFile(fs *filesystem, path string, data []byte) error {
 	// Open file
 	file, err := fs.Filesystem.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fs.FilePermissionMode)
 	if err != nil {
@@ -65,6 +65,15 @@ func commitFile(fs *filesystem, path string, data []byte, commit Commit) error {
 	err = file.Close()
 	if err != nil {
 		log.Println("close file: " + err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func commitFile(fs *filesystem, path string, data []byte, commit Commit) error {
+	err := saveFile(fs, path, data)
+	if err != nil {
 		return err
 	}
 

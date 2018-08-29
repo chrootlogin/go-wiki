@@ -2,8 +2,7 @@ package store
 
 import (
 	"errors"
-	"fmt"
-	"log"
+		"log"
 	"encoding/json"
 
 	"github.com/patrickmn/go-cache"
@@ -38,13 +37,7 @@ func (u *UserList) Add(user common.User) error {
 		return err
 	}
 
-	err = filesystem.New().Commit("prefs/_users.json", filesystem.File{Content:string(jsonData)}, filesystem.Commit{
-		Message: fmt.Sprintf("Added user: %s", user.Username),
-		Author: common.User{
-			Username: "system",
-			Email: "go-wiki@example.org",
-		},
-	})
+	err = filesystem.New(filesystem.WithChroot("prefs")).Save("_users.json", filesystem.File{Content:string(jsonData)})
 	if err != nil {
 		return err
 	}
@@ -66,7 +59,7 @@ func GetUserList() (*UserList, error) {
 	}
 
 	// otherwise read from disk
-	usersRaw, err := filesystem.New().Get("prefs/_users.json")
+	usersRaw, err := filesystem.New(filesystem.WithChroot("prefs")).Get("_users.json")
 	if err != nil {
 		log.Fatal(err)
 	}

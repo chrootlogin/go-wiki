@@ -144,6 +144,20 @@ func (fs *filesystem) Get(path string) (*File, error) {
 	return file, nil
 }
 
+func (fs *filesystem) Save(path string, file File) error {
+	// check for error
+	if fs.Error != nil {
+		return fs.Error
+	}
+
+	err := saveFile(fs, path, []byte(file.Content))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (fs *filesystem) Commit(path string, file File, commit Commit) error {
 	// check for error
 	if fs.Error != nil {
