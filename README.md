@@ -1,4 +1,6 @@
 # Go-Wiki
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchrootlogin%2Fgo-wiki.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchrootlogin%2Fgo-wiki?ref=badge_shield)
+
 
 **This is work in progress!**
 
@@ -62,3 +64,6 @@ cd /frontend
 npm install
 npm run dev
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchrootlogin%2Fgo-wiki.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchrootlogin%2Fgo-wiki?ref=badge_large)
