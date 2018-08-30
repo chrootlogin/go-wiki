@@ -57,6 +57,8 @@ func initRouter() {
 	{
 		api.GET("/config", config.GetConfigHandler)
 
+		api.GET("/user/*username", user.GetUserHandler)
+
 		api.GET("/list/*path", filemanager.ListFolderHandler)
 		api.POST("/raw/*path", filemanager.PostFileHandler)
 

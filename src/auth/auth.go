@@ -73,16 +73,8 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			claims := token.Claims.(jwt.MapClaims)
 			userId := claims["id"].(string)
 
-			// check database
-			userList, err := store.GetUserList()
-			if err != nil {
-				log.Println("Error loading users: " + err.Error())
-				c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
-				return
-			}
-
 			// check if user exits
-			user, err = userList.Get(userId)
+			user, err = store.GetUserList().Get(userId)
 			if err != nil {
 				c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, common.ApiResponse{Message: err.Error()})
@@ -120,16 +112,9 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	userList, err := store.GetUserList()
-	if err != nil {
-		log.Println("Error loading users: " + err.Error())
-		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
-		return
-	}
-
 	loginIsError := false
 
-	user, err := userList.Get(loginData.Username)
+	user, err := store.GetUserList().Get(loginData.Username)
 	if err != nil {
 		loginIsError = true
 		log.Println(err.Error())

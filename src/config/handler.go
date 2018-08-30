@@ -1,9 +1,11 @@
 package config
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-		"net/http"
-			"github.com/chrootlogin/go-wiki/src/lib/store"
+
+	"github.com/chrootlogin/go-wiki/src/lib/store"
 )
 
 // Read

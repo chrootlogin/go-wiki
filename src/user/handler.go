@@ -1,8 +1,7 @@
 package user
 
 import (
-	"log"
-	"fmt"
+		"fmt"
 	"errors"
 	"regexp"
 	"net/http"
@@ -15,10 +14,16 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 )
 
-type ApiRequest struct {
+type apiRequest struct {
 	Name     string `json:"username"`
 	Password string `json:"password"`
-	EMail    string `json:"email"`
+	Email    string `json:"email"`
+}
+
+type apiResponse struct {
+	Username    string   `json:"username"`
+	Email       string   `json:"email"`
+	Permissions []string `json:"permissions"`
 }
 
 func RegisterHandler(c *gin.Context) {
@@ -28,16 +33,9 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	var data ApiRequest
+	var data apiRequest
 	if c.BindJSON(&data) == nil {
-		userList, err := store.GetUserList()
-		if err != nil {
-			log.Println("Error loading users: " + err.Error())
-			c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Error loading users."})
-			return
-		}
-
-		if err := validateNewUser(userList, data.Name, data.Password, data.EMail); err != nil {
+		if err := validateNewUser(data.Name, data.Password, data.Email); err != nil {
 			c.JSON(http.StatusBadRequest, common.ApiResponse{Message: err.Error()})
 			return
 		}
@@ -50,11 +48,11 @@ func RegisterHandler(c *gin.Context) {
 
 		user := common.User{
 			Username: data.Name,
-			Email: data.EMail,
+			Email: data.Email,
 			PasswordHash: passwordHash,
 		}
 
-		err = userList.Add(user)
+		err = store.GetUserList().Add(user)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, common.ApiResponse{Message: "Unable to register user: " + err.Error()})
 			return
@@ -68,7 +66,32 @@ func RegisterHandler(c *gin.Context) {
 	}
 }
 
-func validateNewUser(ul *store.UserList, name string, password string, email string) error {
+func GetUserHandler(c *gin.Context) {
+	userName := c.Param("username")
+	if len(userName) <= 1 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
+		return
+	}
+
+	// remove first character because it's always /
+	userName = trimLeftChar(userName)
+
+	user, err := store.GetUserList().Get(userName)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: fmt.Sprintf("Can't get user list: %s", err.Error())})
+		return
+	}
+
+	resp := apiResponse{
+		Username: user.Username,
+		Email: user.Email,
+		Permissions: user.Permissions,
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func validateNewUser(name string, password string, email string) error {
 	if len(name) <= 3 {
 		return errors.New("Username must be at least 3 chars.")
 	}
@@ -91,10 +114,20 @@ func validateNewUser(ul *store.UserList, name string, password string, email str
 		return errors.New("The email address is invalid.")
 	}
 
-	_, err = ul.Get(name)
+	_, err = store.GetUserList().Get(name)
 	if err == nil {
 		return errors.New("Sorry, the username '" + name + "' is already taken.")
 	}
 
 	return nil
+}
+
+// https://stackoverflow.com/a/48798875
+func trimLeftChar(s string) string {
+	for i := range s {
+		if i > 0 {
+			return s[i:]
+		}
+	}
+	return s[:0]
 }

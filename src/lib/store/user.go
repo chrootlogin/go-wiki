@@ -1,26 +1,30 @@
 package store
 
 import (
-	"errors"
-		"log"
+					"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"log"
 	"encoding/json"
-
 	"github.com/patrickmn/go-cache"
+	"errors"
+	)
 
-	"github.com/chrootlogin/go-wiki/src/lib/common"
-    "github.com/chrootlogin/go-wiki/src/lib/filesystem"
-)
-
-type UserList struct {
+type userList struct {
 	Users map[string]common.User
+	Error error
 }
 
-func (u *UserList) GetAll() map[string]common.User {
+/*func (u *UserList) GetAll() map[string]common.User {
 	return u.Users
-}
+}*/
 
-func (u *UserList) Get(username string) (common.User, error) {
-	value, ok := u.Users[username]
+func (ul *userList) Get(username string) (common.User, error) {
+	// check for error
+	if ul.Error != nil {
+		return common.User{}, ul.Error
+	}
+
+	value, ok := ul.Users[username]
 	if ok {
 		value.Username = username
 		return value, nil
@@ -29,10 +33,15 @@ func (u *UserList) Get(username string) (common.User, error) {
 	}
 }
 
-func (u *UserList) Add(user common.User) error {
-	u.Users[user.Username] = user
+func (ul *userList) Add(user common.User) error {
+	// check for error
+	if ul.Error != nil {
+		return ul.Error
+	}
 
-	jsonData, err := json.Marshal(u.Users)
+	ul.Users[user.Username] = user
+
+	jsonData, err := json.Marshal(ul.Users)
 	if err != nil {
 		return err
 	}
@@ -47,15 +56,15 @@ func (u *UserList) Add(user common.User) error {
 	return nil
 }
 
-func GetUserList() (*UserList, error) {
+func GetUserList() (*userList) {
 	// check if users are in cache
 	cachedUsers, found := storeCache.Get("users")
 	if found {
-		ul := &UserList{
+		ul := &userList{
 			Users: cachedUsers.(map[string]common.User),
 		}
 
-		return ul, nil
+		return ul
 	}
 
 	// otherwise read from disk
@@ -69,15 +78,16 @@ func GetUserList() (*UserList, error) {
 	err = json.Unmarshal([]byte(usersRaw.Content), &users)
 	if err != nil {
 		log.Println("unmarshal: " + err.Error())
-		return nil, err
+
+		return &userList{
+			Error: err,
+		}
 	}
 
 	// add to cache with no expiration
 	storeCache.Set("users", users, cache.NoExpiration)
 
-	var ul = &UserList{
+	return &userList{
 		Users: users,
 	}
-
-	return ul, nil
 }
