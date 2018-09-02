@@ -12,7 +12,7 @@ go_app:
 	$(GOLANG) build -o go-wiki main.go
 
 test:
-	$(GOLANG) test github.com/chrootlogin/go-wiki/src/lib/helper
+	$(GOLANG) test ./...
 
 clean:
 	rm -rf vendor
