@@ -21,7 +21,7 @@ RUN set -ex \
   && export PATH="${GOPATH}/bin:${PATH}" \
   && go get -u github.com/go-bindata/go-bindata/... \
   && sync \
-  && GOOS=linux GOARCH=amd64 CGO_ENABLED=1 make
+  && GOOS=linux GOARCH=amd64 CGO_ENABLED=1 make dependencies go_bindata test go_app
 
 # Build go-wiki container
 FROM alpine:3.8
