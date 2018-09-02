@@ -3,9 +3,9 @@ package pagestore
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
@@ -25,7 +25,7 @@ func TestPagestore_Commit(t *testing.T) {
 		Message: "Test file",
 		Author: common.User{
 			Username: "test",
-			Email: "test@example.org",
+			Email:    "test@example.org",
 		},
 	}
 
@@ -46,7 +46,7 @@ func TestPagestore_Get(t *testing.T) {
 		Message: "Test file",
 		Author: common.User{
 			Username: "test",
-			Email: "test@example.org",
+			Email:    "test@example.org",
 		},
 	}
 

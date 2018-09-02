@@ -1,13 +1,13 @@
 package pagestore
 
 import (
-	"time"
-	"log"
 	"fmt"
+	"log"
+	"time"
 
 	"gopkg.in/src-d/go-git.v4"
-	gitfs "gopkg.in/src-d/go-git.v4/storage/filesystem"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	gitfs "gopkg.in/src-d/go-git.v4/storage/filesystem"
 
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
@@ -31,7 +31,7 @@ func getRepository(fs *filesystem.Filesystem) (*git.Repository, error) {
 			log.Fatal(fmt.Sprintf("Can't create git repository: %s", err.Error()))
 		}
 
-		for _ , assetName := range AssetNames() {
+		for _, assetName := range AssetNames() {
 			fileContent, err := Asset(assetName)
 			if err != nil {
 				log.Fatal(fmt.Sprintf("Getting asset error: %s", err.Error()))

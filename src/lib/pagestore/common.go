@@ -1,8 +1,8 @@
 package pagestore
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"gopkg.in/src-d/go-git.v4"
 
