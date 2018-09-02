@@ -11,8 +11,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
-	"fmt"
 )
+
+func setupTestCase(t *testing.T) func(t *testing.T) {
+	t.Log("setup test case")
+	return func(t *testing.T) {
+		t.Log("teardown test case")
+	}
+}
+
+func setupSubTest(t *testing.T) func(t *testing.T) {
+	t.Log("setup sub test")
+	return func(t *testing.T) {
+		t.Log("teardown sub test")
+	}
+}
 
 func TestPostPageHandler(t *testing.T) {
 	assert := assert.New(t)
@@ -71,8 +84,6 @@ func TestPutPageHandler(t *testing.T) {
 	f, err := pagestore.New().Get("a-new-test.md")
 
 	if assert.NoError(err) {
-
-		fmt.Println(f.Content)
 		assert.Equal(apiReq.Content, f.Content)
 	}
 }

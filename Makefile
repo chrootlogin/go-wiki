@@ -15,6 +15,7 @@ go_app:
 
 test:
 	$(GOLANG) test ./...
+	find . -type d -iname data -prune -exec rm -rf '{}' '+'
 
 clean:
 	find . -type d -iname data -prune -exec rm -rf '{}' '+'
