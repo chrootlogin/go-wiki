@@ -1,10 +1,10 @@
 package filemanager
 
 import (
-	"net/http/httptest"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
