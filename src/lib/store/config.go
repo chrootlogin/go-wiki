@@ -1,15 +1,17 @@
 package store
 
 import (
-	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"encoding/json"
-	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/patrickmn/go-cache"
-		"log"
 	"fmt"
+	"log"
+
+	"github.com/patrickmn/go-cache"
+
+	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
-func Config() (common.Configuration) {
+func Config() common.Configuration {
 	configI, found := storeCache.Get("config")
 	if !found {
 		// Load from filesystem
@@ -38,5 +40,3 @@ func Config() (common.Configuration) {
 
 	return config
 }
-
-

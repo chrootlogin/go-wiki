@@ -17,15 +17,14 @@ var pluginMap = map[string]plugin.Plugin{
 func Load() {
 	log.Println("Starting plugins...")
 
-
-	allPlugins, err := plugin.Discover("*","./plugins")
+	allPlugins, err := plugin.Discover("*", "./plugins")
 	if err != nil {
 		panic(err)
 	}
 
 	for _, filename := range allPlugins {
 		client := plugin.NewClient(&plugin.ClientConfig{
-			Plugins: 		 pluginMap,
+			Plugins:         pluginMap,
 			HandshakeConfig: module.HandshakeConfig,
 			Cmd:             exec.Command(filename),
 		})

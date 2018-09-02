@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func GetClientUser(c *gin.Context) (common.User, bool) {

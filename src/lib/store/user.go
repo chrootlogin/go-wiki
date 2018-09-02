@@ -1,13 +1,15 @@
 package store
 
 import (
-					"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	"log"
 	"encoding/json"
-	"github.com/patrickmn/go-cache"
 	"errors"
-	)
+	"log"
+
+	"github.com/patrickmn/go-cache"
+
+	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+)
 
 type userList struct {
 	Users map[string]common.User
@@ -46,7 +48,7 @@ func (ul *userList) Add(user common.User) error {
 		return err
 	}
 
-	err = filesystem.New(filesystem.WithChroot("prefs")).Save("_users.json", filesystem.File{Content:string(jsonData)})
+	err = filesystem.New(filesystem.WithChroot("prefs")).Save("_users.json", filesystem.File{Content: string(jsonData)})
 	if err != nil {
 		return err
 	}
@@ -56,7 +58,7 @@ func (ul *userList) Add(user common.User) error {
 	return nil
 }
 
-func UserList() (*userList) {
+func UserList() *userList {
 	// check if users are in cache
 	cachedUsers, found := storeCache.Get("users")
 	if found {

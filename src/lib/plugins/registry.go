@@ -3,13 +3,14 @@ package plugins
 import (
 	"sync"
 
-	"github.com/hashicorp/go-plugin"
 	"github.com/gin-gonic/gin"
+	"github.com/hashicorp/go-plugin"
 
 	"github.com/chrootlogin/go-wiki-plugin-sdk"
 )
 
 var registry *pluginRegistry
+
 type pluginRegistry struct {
 	extensions map[string]Extension
 }

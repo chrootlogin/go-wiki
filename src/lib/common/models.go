@@ -18,12 +18,12 @@ type ApiResponse struct {
 
 type File struct {
 	ContentType string            `json:"content-type"`
-	Content     string 			  `json:"content"`
-	Metadata	map[string]string `json:"metadata"`
+	Content     string            `json:"content"`
+	Metadata    map[string]string `json:"metadata"`
 }
 
 type Page struct {
-	Content  string			   `json:"content"`
+	Content  string            `json:"content"`
 	Metadata map[string]string `json:"metadata"`
 }
 
