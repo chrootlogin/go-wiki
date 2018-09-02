@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
