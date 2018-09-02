@@ -2,7 +2,7 @@
 
 **This is work in progress!**
 
-[![Build Status](https://travis-ci.com/chrootlogin/go-wiki.svg?branch=master)](https://travis-ci.com/chrootlogin/go-wiki) ![](https://sonarcloud.io/api/project_badges/measure?project=chrootlogin_go-wiki&metric=alert_status)
+[![Build Status](https://travis-ci.com/chrootlogin/go-wiki.svg?branch=master)](https://travis-ci.com/chrootlogin/go-wiki) ![](https://sonarcloud.io/api/project_badges/measure?project=chrootlogin_go-wiki&metric=alert_status) [![](https://images.microbadger.com/badges/image/rootlogin/go-wiki.svg)](https://microbadger.com/images/rootlogin/go-wiki)
 
 A wiki software written in Go.
 
