@@ -508,6 +508,7 @@
     "github.com/chrootlogin/go-wiki-plugin-sdk",
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
+    "github.com/gin-gonic/gin/json",
     "github.com/hashicorp/go-plugin",
     "github.com/microcosm-cc/bluemonday",
     "github.com/patrickmn/go-cache",
