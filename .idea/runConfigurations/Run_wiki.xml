@@ -7,9 +7,9 @@
       <env name="SESSION_KEY" value="not-a-secure-key" />
     </envs>
     <kind value="FILE" />
-    <filePath value="$PROJECT_DIR$/wiki.go" />
+    <filePath value="$PROJECT_DIR$/main.go" />
     <package value="github.com/chrootlogin/go-wiki" />
     <directory value="$PROJECT_DIR$/" />
-    <method />
+    <method v="2" />
   </configuration>
 </component>
