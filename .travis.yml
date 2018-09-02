@@ -30,8 +30,10 @@ jobs:
     - # skip
 
     script:
+    - make dependencies
+    - make test
     - sonar-scanner
-    - make dependencies test go_app
+    - make go_app
 
     deploy:
     - provider: script
