@@ -63,8 +63,8 @@ func initRouter() {
 		api.POST("/raw/*path", filemanager.PostFileHandler)
 
 		api.GET("/page/*path", page.GetPageHandler)
-		//api.POST("/page/*path", page.PostPageHandler)
-		//api.PUT("/page/*path", page.PutPageHandler)
+		api.POST("/page/*path", page.PostPageHandler)
+		api.PUT("/page/*path", page.PutPageHandler)
 
 		api.POST("/preview", page.PostPreviewHandler)
 	}
