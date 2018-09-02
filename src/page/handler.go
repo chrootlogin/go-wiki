@@ -178,7 +178,6 @@ func PutPageHandler(c *gin.Context) {
 			return
 		}
 
-		// flush pageCache @TODO
 		pageCache.Flush()
 
 		c.JSON(http.StatusOK, common.ApiResponse{
