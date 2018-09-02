@@ -3,6 +3,8 @@ data/
 /plugins/
 go-wiki
 
+.idea/vcs.xml
+
 # Created by .ignore support modules (hsz.mobi)
 ### Linux template
 *~
