@@ -51,13 +51,12 @@ func init() {
 		}
 
 		dataPath = filepath.Join(dir, "data")
-		log.Println("Environment variable DATA_DIR is empty. Using: " + dataPath)
-	} else {
-		log.Println("Using data directory: " + dataPath)
+		log.Println("Environment variable DATA_DIR is empty")
 	}
 
-	initDataDir()
+	log.Println(fmt.Sprintf("Using data directory: %s",dataPath))
 
+	initDataDir()
 	filesystemCache = cache.New(30*time.Minute, 10*time.Minute)
 }
 
