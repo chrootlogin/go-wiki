@@ -44,3 +44,24 @@ func TestFilesystem_Save(t *testing.T) {
 
 	assert.Equal(file.Content, f.Content)
 }
+
+func TestFilesystem_Has(t *testing.T) {
+	assert := assert.New(t)
+
+	file := File{
+		Content: "test file",
+	}
+
+	err := New().Save("test2.tmp", file)
+	if assert.NoError(err) {
+		has, err := New().Has("test2.tmp")
+		if assert.NoError(err) {
+			assert.True(has)
+		}
+
+		has, err = New().Has("no-existing-test.tmp")
+		if assert.NoError(err) {
+			assert.False(has)
+		}
+	}
+}
