@@ -61,9 +61,7 @@ func TestPostPageHandler(t *testing.T) {
 		req.Header.Add("Content-Length", string(len(data)))
 		r.ServeHTTP(w, req)
 
-		if w.Code != http.StatusCreated {
-			t.Error(w.Body)
-		}
+		assert.Equal(http.StatusCreated, w.Code)
 	}
 
 	f, err := pagestore.New().Get("a-new-test.md")
@@ -95,6 +93,29 @@ func TestPostPageHandler2(t *testing.T) {
 	}
 }
 
+func TestPostPageHandler3(t *testing.T) {
+	assert := assert.New(t)
+
+	apiReq := apiRequest{
+		Content: "This is a nice test page!",
+	}
+
+	data, err := json.Marshal(apiReq)
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.POST("/api/page/*path", loginPostPageHandler)
+
+		req, _ := http.NewRequest("POST", "/api/page/a-new-test.md", bytes.NewReader(data))
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Length", string(len(data)))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusConflict, w.Code)
+	}
+}
+
 func TestPutPageHandler(t *testing.T) {
 	assert := assert.New(t)
 
@@ -114,9 +135,7 @@ func TestPutPageHandler(t *testing.T) {
 		req.Header.Add("Content-Length", string(len(data)))
 		r.ServeHTTP(w, req)
 
-		if w.Code != http.StatusOK {
-			t.Error(w.Body)
-		}
+		assert.Equal(http.StatusOK, w.Code)
 	}
 
 	f, err := pagestore.New().Get("a-new-test.md")
@@ -146,6 +165,34 @@ func TestPutPageHandler2(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		assert.Equal(http.StatusUnauthorized, w.Code)
+	}
+}
+
+func TestPutPageHandler3(t *testing.T) {
+	assert := assert.New(t)
+
+	apiReq := apiRequest{
+		Content: "This is a nicer test page!",
+	}
+
+	data, err := json.Marshal(apiReq)
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.PUT("/api/page/*path", loginPutPageHandler)
+
+		req, _ := http.NewRequest("PUT", "/api/page/a-not-existing-test.md", bytes.NewReader(data))
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Length", string(len(data)))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusNotFound, w.Code)
+	}
+
+	has, err := pagestore.New().Has("a-not-existing-test.md")
+	if assert.NoError(err) {
+		assert.False(has)
 	}
 }
 

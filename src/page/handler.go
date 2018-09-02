@@ -53,7 +53,7 @@ func PostPageHandler(c *gin.Context) {
 		return
 	}
 	if has {
-		c.JSON(http.StatusNotFound, common.ApiResponse{Message: "File found, use PUT to update."})
+		c.JSON(http.StatusConflict, common.ApiResponse{Message: "File found, use PUT to update."})
 		return
 	}
 
