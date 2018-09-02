@@ -15,11 +15,3 @@ func WithChroot(chrootDir string) Option {
 		return nil
 	}
 }
-
-func WithMetadata() Option {
-	return func(fs *Filesystem) error {
-		fs.WithMetadata = true
-
-		return nil
-	}
-}

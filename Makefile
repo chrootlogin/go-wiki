@@ -17,4 +17,6 @@ test:
 	$(GOLANG) test ./...
 
 clean:
+	find . -type d -iname data -prune -exec rm -rf '{}' '+'
+	rm -f src/lib/pagestore/default.go
 	rm -rf vendor

@@ -3,13 +3,11 @@ package filesystem
 import (
 	"os"
 	"errors"
-	"encoding/json"
-
-	"gopkg.in/src-d/go-billy.v4"
-
-	"gopkg.in/src-d/go-billy.v4/osfs"
 	"log"
 	"path/filepath"
+
+	"gopkg.in/src-d/go-billy.v4"
+	"gopkg.in/src-d/go-billy.v4/osfs"
 )
 
 var (
@@ -33,7 +31,6 @@ type Filesystem struct {
 	Error error
 	FilePermissionMode os.FileMode
 	ChrootDirectory string
-	WithMetadata bool
 }
 
 func init() {
@@ -67,7 +64,6 @@ func New(options ...Option) *Filesystem {
 	var fs = &Filesystem{
 		FilePermissionMode: 0644,
 		ChrootDirectory: "",
-		WithMetadata: false,
 		Filesystem: osfs.New(dataPath),
 	}
 
@@ -139,30 +135,6 @@ func (fs *Filesystem) Get(path string) (*File, error) {
 	file := &File{
 		Content: string(data),
 		FileInfo: fileinfo,
-	}
-
-	// if metadata enabled, get metadata file if available
-	if fs.WithMetadata {
-		metajson, _, err := readFile(fs, path + ".meta")
-		if err != nil {
-			// if meta file is not available, return empty metadata
-			if os.IsNotExist(err) {
-				file.Metadata = Metadata{}
-				return file, nil
-			}
-
-			// otherwise return error
-			return nil, err
-		}
-
-		// unmarshal and add metadata
-		var metadata Metadata
-		err = json.Unmarshal(metajson, &metadata)
-		if err != nil {
-			return nil, err
-		}
-
-		file.Metadata = metadata
 	}
 
 	return file, nil
