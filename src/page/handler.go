@@ -6,13 +6,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/patrickmn/go-cache"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/imdario/mergo"
-	"github.com/patrickmn/go-cache"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/helper"
+	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
@@ -36,7 +35,7 @@ func init() {
 }
 
 // CREATE
-func PostPageHandler(c *gin.Context) {
+/*func PostPageHandler(c *gin.Context) {
 	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
@@ -71,10 +70,10 @@ func PostPageHandler(c *gin.Context) {
 		// add default permissions for author: "read, write, admin"
 		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
 
-		/*err := fs.Commit(path, file, filesystem.Commit{
+		err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Created page: " + path,
-		})*/
+		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
@@ -87,6 +86,7 @@ func PostPageHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
 }
+*/
 
 // READ
 func GetPageHandler(c *gin.Context) {
@@ -137,12 +137,12 @@ func GetPageHandler(c *gin.Context) {
 }
 
 // UPDATE
-func PutPageHandler(c *gin.Context) {
-	/*user, exists := helper.GetClientUser(c)
+/*func PutPageHandler(c *gin.Context) {
+	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return
-	}*/
+	}
 
 	path := c.Param("path")
 
@@ -169,10 +169,10 @@ func PutPageHandler(c *gin.Context) {
 			return
 		}
 
-		/*err := fs.Commit(path, file, filesystem.Commit{
+		err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
-		})*/
+		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
@@ -187,6 +187,7 @@ func PutPageHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
 }
+*/
 
 // GET A PREVIEW
 func PostPreviewHandler(c *gin.Context) {
@@ -215,8 +216,6 @@ func renderPage(html string) string {
 }
 
 func getPage(path string) (*filesystem.File, string, error) {
-	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
-
 	// possible paths
 	var paths []string
 	if path == "/" {
@@ -234,7 +233,7 @@ func getPage(path string) (*filesystem.File, string, error) {
 	for i := range paths {
 		effectivePath := paths[i]
 
-		file, err := fs.Get(effectivePath)
+		file, err := pagestore.New().Get(effectivePath)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue

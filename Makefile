@@ -9,6 +9,7 @@ dependencies:
 
 go_bindata:
 	$(GOBINDATA) -pkg repo -prefix default/ -o src/lib/repo/default.go default/pages/ default/pages/docs/ default/prefs/
+	$(GOBINDATA) -pkg pagestore -prefix default/pages -o src/lib/pagestore/default.go default/pages/ default/pages/docs/
 
 go_app:
 	$(GOLANG) build -o go-wiki main.go

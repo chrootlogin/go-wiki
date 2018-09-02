@@ -18,8 +18,7 @@ func getRepository(fs *filesystem.Filesystem) (*git.Repository, error) {
 		log.Fatal(fmt.Printf("Error checking .git repository: %s", err.Error()))
 	}
 
-	wt := fs.Filesystem
-	dot, _ := wt.Chroot(".git")
+	dot, _ := fs.Filesystem.Chroot(".git")
 
 	s, err := gitfs.NewStorage(dot)
 	if err != nil {
@@ -27,10 +26,48 @@ func getRepository(fs *filesystem.Filesystem) (*git.Repository, error) {
 	}
 
 	if !exists {
-		return git.Init(s, wt)
+		repo, err := git.Init(s, fs.Filesystem)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Can't create git repository: %s", err.Error()))
+		}
+
+		for _ , assetName := range AssetNames() {
+			fileContent, err := Asset(assetName)
+			if err != nil {
+				log.Fatal(fmt.Sprintf("Getting asset error: %s", err.Error()))
+			}
+
+			err = fs.Save(assetName, filesystem.File{
+				Content: string(fileContent),
+			})
+			if err != nil {
+				log.Fatal(fmt.Sprintf("Saving asset error: %s", err.Error()))
+			}
+		}
+
+		wt, err := repo.Worktree()
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Failed opening worktree: %s", err.Error()))
+		}
+
+		_, err = wt.Add(".")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Creating initial commit
+		_, err = wt.Commit("Initial commit...", &git.CommitOptions{
+			Author: &object.Signature{
+				Name:  "system",
+				Email: "go-wiki@example.org",
+				When:  time.Now(),
+			},
+		})
+
+		return repo, nil
 	}
 
-	return git.Open(s, wt)
+	return git.Open(s, fs.Filesystem)
 }
 
 func commitFile(ps *pagestore, path string, file filesystem.File, commit Commit) error {
