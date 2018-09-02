@@ -30,7 +30,7 @@ jobs:
     - # skip
 
     script:
-    - make dependencies
+    - make dependencies go_bindata
     - make test
     - sonar-scanner
     - make go_app
