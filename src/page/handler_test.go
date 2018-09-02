@@ -72,6 +72,29 @@ func TestPostPageHandler(t *testing.T) {
 	}
 }
 
+func TestPostPageHandler2(t *testing.T) {
+	assert := assert.New(t)
+
+	apiReq := apiRequest{
+		Content: "",
+	}
+
+	data, err := json.Marshal(apiReq)
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.POST("/api/page/*path", PostPageHandler)
+
+		req, _ := http.NewRequest("POST", "/api/page/a-new-test.md", bytes.NewReader(data))
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Length", string(len(data)))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusUnauthorized, w.Code)
+	}
+}
+
 func TestPutPageHandler(t *testing.T) {
 	assert := assert.New(t)
 
@@ -100,6 +123,29 @@ func TestPutPageHandler(t *testing.T) {
 
 	if assert.NoError(err) {
 		assert.Equal(apiReq.Content, f.Content)
+	}
+}
+
+func TestPutPageHandler2(t *testing.T) {
+	assert := assert.New(t)
+
+	apiReq := apiRequest{
+		Content: "",
+	}
+
+	data, err := json.Marshal(apiReq)
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.PUT("/api/page/*path", PutPageHandler)
+
+		req, _ := http.NewRequest("PUT", "/api/page/a-new-test.md", bytes.NewReader(data))
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Length", string(len(data)))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusUnauthorized, w.Code)
 	}
 }
 
