@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Make Project" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile">
-    <makefile filename="$PROJECT_DIR$/Makefile" target="" workingDirectory="" arguments="">
+    <makefile filename="$PROJECT_DIR$/Makefile" target="clean dependencies go_bindata go_app" workingDirectory="" arguments="">
       <envs />
     </makefile>
-    <method />
+    <method v="2" />
   </configuration>
 </component>

@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Tests" type="GoTestRunConfiguration" factoryName="Go Test">
+    <module name="go-wiki" />
+    <working_directory value="$PROJECT_DIR$/" />
+    <go_parameters value="-i" />
+    <framework value="gotest" />
+    <kind value="DIRECTORY" />
+    <package value="github.com/chrootlogin/go-wiki" />
+    <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$/" />
+    <pattern value="./..." />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Clean" run_configuration_type="MAKEFILE_TARGET_RUN_CONFIGURATION" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Dependencies" run_configuration_type="MAKEFILE_TARGET_RUN_CONFIGURATION" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Create Bindata" run_configuration_type="MAKEFILE_TARGET_RUN_CONFIGURATION" />
+    </method>
+  </configuration>
+</component>
