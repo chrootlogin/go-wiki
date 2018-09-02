@@ -11,6 +11,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/gin-gonic/gin/json"
 	"fmt"
+	"github.com/patrickmn/go-cache"
+	"time"
 )
 
 const DEFAULT_FILE_PERMISSIONS = 0644
@@ -19,6 +21,7 @@ var (
 	ErrIsDir = errors.New("is a directory")
 	ErrIsFile = errors.New("is a file")
 	dataPath = ""
+	filesystemCache *cache.Cache
 )
 
 type File struct {
@@ -54,6 +57,8 @@ func init() {
 	}
 
 	initDataDir()
+
+	filesystemCache = cache.New(30*time.Minute, 10*time.Minute)
 }
 
 func initDataDir() {
@@ -144,6 +149,23 @@ func (fs *Filesystem) Get(path string) (*File, error) {
 		return nil, fs.Error
 	}
 
+	// set cache path
+	cachePath := path
+	if len(fs.ChrootDirectory) > 0 {
+		cachePath = filepath.Join(fs.ChrootDirectory, cachePath)
+	}
+
+	// check if file is cached
+	f, exists := filesystemCache.Get(cachePath)
+	if exists {
+		file, ok := f.(File)
+		if !ok {
+			return nil, errors.New("cached file corrupt")
+		}
+
+		return &file, nil
+	}
+
 	data, fileinfo, err := readFile(fs, path)
 	if err != nil {
 		return nil, err
@@ -153,6 +175,9 @@ func (fs *Filesystem) Get(path string) (*File, error) {
 		Content: string(data),
 		FileInfo: fileinfo,
 	}
+
+	// write to cache
+	filesystemCache.Set(cachePath, file, cache.DefaultExpiration)
 
 	return file, nil
 }
@@ -167,6 +192,15 @@ func (fs *Filesystem) Save(path string, file File) error {
 	if err != nil {
 		return err
 	}
+
+	// set cache path
+	cachePath := path
+	if len(fs.ChrootDirectory) > 0 {
+		cachePath = filepath.Join(fs.ChrootDirectory, cachePath)
+	}
+
+	// Delete from cache path
+	filesystemCache.Delete(cachePath)
 
 	return nil
 }
