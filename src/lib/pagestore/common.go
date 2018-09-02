@@ -7,6 +7,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"os"
 )
 
 const PAGES_DIR = "pages"
@@ -35,6 +36,10 @@ func (ps *pagestore) Get(path string) (*filesystem.File, error) {
 
 func (ps *pagestore) Has(path string) (bool, error) {
 	return ps.filesystem.Has(path)
+}
+
+func (ps *pagestore) List(path string) ([]os.FileInfo, error) {
+	return ps.filesystem.List(path)
 }
 
 func (ps *pagestore) Commit(path string, file filesystem.File, commit Commit) error {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 )
 
 type apiResponse struct {
@@ -30,10 +31,7 @@ type fileResponse struct {
 func ListFolderHandler(c *gin.Context) {
 	path := c.Param("path")
 
-	// Init Filesystem
-	fs := filesystem.New(filesystem.WithChroot("pages"))
-
-	dirContent, err := fs.List(path)
+	dirContent, err := pagestore.New().List(path)
 	if err != nil {
 		if err == filesystem.ErrIsFile {
 			c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: fmt.Sprintf("Path '%s' is not a directory!", path)})

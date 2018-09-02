@@ -53,7 +53,15 @@ func TestPagestore_Has(t *testing.T) {
 	if assert.NoError(err) {
 		assert.False(has)
 	}
+}
 
+func TestPagestore_List(t *testing.T) {
+	assert := assert.New(t)
+
+	filesinfo, err := New().List("")
+	if assert.NoError(err) {
+		assert.True(len(filesinfo) > 0)
+	}
 }
 
 func commitTestFile(path string) error {
