@@ -11,6 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"bytes"
+	"mime/multipart"
+	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
 func TestListFolderHandler(t *testing.T) {
@@ -51,6 +54,48 @@ func TestPostFileHandler(t *testing.T) {
 		err = json.Unmarshal(body, &resp)
 		if assert.NoError(err) {
 			assert.Equal(http.StatusInternalServerError, w.Code)
+		}
+	}
+}
+
+func TestPostFileHandler2(t *testing.T) {
+	const TEST_CONTENT = "test content 1234"
+
+	assert := assert.New(t)
+
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.POST("/api/raw/*path", loginPostFileHandler)
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", "testfile.tmp")
+	if assert.NoError(err) {
+		part.Write([]byte(TEST_CONTENT))
+
+		err = writer.Close()
+		if assert.NoError(err) {
+			req, _ := http.NewRequest("POST", "/api/raw/", body)
+			req.Header.Set("Content-Type", writer.FormDataContentType())
+
+			r.ServeHTTP(w, req)
+
+			body, err := ioutil.ReadAll(w.Body)
+			if assert.NoError(err) {
+				var resp common.ApiResponse
+				err = json.Unmarshal(body, &resp)
+				if assert.NoError(err) {
+					t.Log(resp.Message)
+
+					assert.Equal(http.StatusCreated, w.Code)
+
+					file, err := filesystem.New(filesystem.WithChroot("pages")).Get("testfile.tmp")
+					if assert.NoError(err) {
+						assert.Equal(TEST_CONTENT, file.Content)
+					}
+				}
+			}
 		}
 	}
 }

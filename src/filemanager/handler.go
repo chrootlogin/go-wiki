@@ -125,5 +125,5 @@ func PostFileHandler(c *gin.Context) {
 		fileCount++
 	}
 
-	c.JSON(http.StatusOK, common.ApiResponse{Message: fmt.Sprintf("%d files uploaded.", fileCount)})
+	c.JSON(http.StatusCreated, common.ApiResponse{Message: fmt.Sprintf("%d files uploaded.", fileCount)})
 }
