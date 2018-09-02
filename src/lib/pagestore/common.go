@@ -33,6 +33,10 @@ func (ps *pagestore) Get(path string) (*filesystem.File, error) {
 	return ps.filesystem.Get(path)
 }
 
+func (ps *pagestore) Has(path string) (bool, error) {
+	return ps.filesystem.Has(path)
+}
+
 func (ps *pagestore) Commit(path string, file filesystem.File, commit Commit) error {
 	err := commitFile(ps, path, file, commit)
 	if err != nil {

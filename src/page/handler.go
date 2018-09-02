@@ -13,6 +13,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"github.com/chrootlogin/go-wiki/src/lib/helper"
 )
 
 var (
@@ -35,7 +36,7 @@ func init() {
 }
 
 // CREATE
-/*func PostPageHandler(c *gin.Context) {
+func PostPageHandler(c *gin.Context) {
 	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
@@ -44,8 +45,8 @@ func init() {
 
 	path := c.Param("path")
 
-	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
-	has, err := fs.Has(path)
+	ps := pagestore.New()
+	has, err := ps.Has(path)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 		return
@@ -70,7 +71,7 @@ func init() {
 		// add default permissions for author: "read, write, admin"
 		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
 
-		err := fs.Commit(path, file, filesystem.Commit{
+		err := ps.Commit(path, file, pagestore.Commit{
 			Author: user,
 			Message: "Created page: " + path,
 		})
@@ -79,14 +80,13 @@ func init() {
 			return
 		}
 
-		c.JSON(http.StatusOK, common.ApiResponse{
+		c.JSON(http.StatusCreated, common.ApiResponse{
 			Message: "Created page.",
 		})
 	} else {
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
 }
-*/
 
 // READ
 func GetPageHandler(c *gin.Context) {

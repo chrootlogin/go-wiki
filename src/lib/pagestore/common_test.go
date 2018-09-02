@@ -3,10 +3,13 @@ package pagestore
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	"github.com/stretchr/testify/assert"
 )
+
+const DEFAULT_CONTENT = "This is a test!"
 
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
@@ -17,19 +20,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestPagestore_Commit(t *testing.T) {
-	file := filesystem.File{
-		Content: "This is a test file",
-	}
-
-	commit := Commit{
-		Message: "Test file",
-		Author: common.User{
-			Username: "test",
-			Email:    "test@example.org",
-		},
-	}
-
-	err := New().Commit("test.file", file, commit)
+	err := commitTestFile("test.file")
 	if err != nil {
 		t.Error(err)
 	}
@@ -38,8 +29,36 @@ func TestPagestore_Commit(t *testing.T) {
 func TestPagestore_Get(t *testing.T) {
 	assert := assert.New(t)
 
+	err := commitTestFile("test2.file")
+	if assert.NoError(err) {
+		f, err := New().Get("test2.file")
+		if assert.NoError(err) {
+			assert.Equal(DEFAULT_CONTENT, f.Content)
+		}
+	}
+}
+
+func TestPagestore_Has(t *testing.T) {
+	assert := assert.New(t)
+
+	err := commitTestFile("existing.file")
+	if assert.NoError(err) {
+		has, err := New().Has("existing.file")
+		if assert.NoError(err) {
+			assert.True(has)
+		}
+	}
+
+	has, err := New().Has("non-existing.file")
+	if assert.NoError(err) {
+		assert.False(has)
+	}
+
+}
+
+func commitTestFile(path string) error {
 	file := filesystem.File{
-		Content: "This is a second test file",
+		Content: DEFAULT_CONTENT,
 	}
 
 	commit := Commit{
@@ -50,11 +69,5 @@ func TestPagestore_Get(t *testing.T) {
 		},
 	}
 
-	err := New().Commit("test2.file", file, commit)
-	if assert.NoError(err) {
-		f, err := New().Get("test2.file")
-		if assert.NoError(err) {
-			assert.Equal(file.Content, f.Content)
-		}
-	}
+	return New().Commit(path, file, commit)
 }
