@@ -12,7 +12,7 @@ go_app:
 	$(GOLANG) build -o go-wiki main.go
 
 test:
-	$(GOLANG) test -coverprofile=coverage.out ./...
+	$(GOLANG) test -json -coverprofile=coverage.out ./... > test-report.out
 
 clean:
 	rm -rf vendor
