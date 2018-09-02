@@ -10,12 +10,14 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
+const CONFIGURATION_CACHE = "configuration"
+
 type configList struct {
 	configuration map[string]string
 }
 
 func Config() *configList {
-	configI, found := storeCache.Get("configuration")
+	configI, found := storeCache.Get(CONFIGURATION_CACHE)
 	if !found {
 		// Load from filesystem
 		file, err := filesystem.New(filesystem.WithChroot("prefs")).Get("_config.json")
@@ -30,7 +32,7 @@ func Config() *configList {
 		}
 
 		// Write to cache
-		storeCache.Set("configuration", config, cache.NoExpiration)
+		storeCache.Set(CONFIGURATION_CACHE, config, cache.NoExpiration)
 
 		return &configList{
 			configuration: config,
@@ -84,6 +86,6 @@ func (cl *configList) Set(key string, value string) error {
 		return err
 	}
 
-	storeCache.Set("configuration", cl.configuration, cache.NoExpiration)
+	storeCache.Set(CONFIGURATION_CACHE, cl.configuration, cache.NoExpiration)
 	return nil
 }
