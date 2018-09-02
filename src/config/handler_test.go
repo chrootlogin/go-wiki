@@ -14,11 +14,6 @@ import (
 )
 
 func TestGetConfigHandler(t *testing.T) {
-	defaultConfig := common.Configuration{
-		Registration: false,
-		Title: "Go-Wiki",
-	}
-
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
@@ -38,7 +33,7 @@ func TestGetConfigHandler(t *testing.T) {
 		t.Error(err)
 	}
 
-	if !reflect.DeepEqual(defaultConfig, readConfiguration) {
+	if !reflect.DeepEqual(common.DefaultFiles["prefs/_config.json"], readConfiguration) {
 		t.Error("Default configuration is not equal.")
 	}
 }

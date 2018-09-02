@@ -4,6 +4,7 @@ import (
 	"os"
 	"log"
 	"io/ioutil"
+	"gopkg.in/src-d/go-billy.v4"
 )
 
 func readFile(fs *Filesystem, path string) ([]byte, os.FileInfo, error) {
@@ -41,9 +42,9 @@ func readFile(fs *Filesystem, path string) ([]byte, os.FileInfo, error) {
 	return data, fileinfo, nil
 }
 
-func saveFile(fs *Filesystem, path string, data []byte) error {
+func saveFile(fs billy.Filesystem, filePerms os.FileMode, path string, data []byte) error {
 	// Open file
-	file, err := fs.Filesystem.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fs.FilePermissionMode)
+	file, err := fs.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerms)
 	if err != nil {
 		log.Println("open file: " + err.Error())
 		return err

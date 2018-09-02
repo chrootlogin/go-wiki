@@ -8,7 +8,12 @@ import (
 
 	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/osfs"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
+	"github.com/gin-gonic/gin/json"
+	"fmt"
 )
+
+const DEFAULT_FILE_PERMISSIONS = 0644
 
 var (
 	ErrIsDir = errors.New("is a directory")
@@ -56,13 +61,25 @@ func initDataDir() {
 		log.Println("Creating new repository...")
 
 		os.Mkdir(dataPath, os.ModePerm)
+		fs := osfs.New(dataPath)
+		for filename, defaultFile := range common.DefaultFiles {
+			jsonData, err := json.Marshal(defaultFile)
+			if err != nil {
+				log.Fatal(fmt.Sprintf("Couldn't marshal default file %s: %s", filename, err.Error()))
+			}
+
+			err = saveFile(fs, DEFAULT_FILE_PERMISSIONS, filename, jsonData)
+			if err != nil {
+				log.Fatal(fmt.Sprintf("Couldn't save default file %s: %s", filename, err.Error()))
+			}
+		}
 	}
 }
 
 func New(options ...Option) *Filesystem {
 	// set default values
 	var fs = &Filesystem{
-		FilePermissionMode: 0644,
+		FilePermissionMode: DEFAULT_FILE_PERMISSIONS,
 		ChrootDirectory: "",
 		Filesystem: osfs.New(dataPath),
 	}
@@ -146,7 +163,7 @@ func (fs *Filesystem) Save(path string, file File) error {
 		return fs.Error
 	}
 
-	err := saveFile(fs, path, []byte(file.Content))
+	err := saveFile(fs.Filesystem, fs.FilePermissionMode, path, []byte(file.Content))
 	if err != nil {
 		return err
 	}
