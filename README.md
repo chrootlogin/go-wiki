@@ -2,6 +2,8 @@
 
 **This is work in progress!**
 
+[![Build Status](https://travis-ci.com/chrootlogin/go-wiki.svg?branch=master)](https://travis-ci.com/chrootlogin/go-wiki) ![](https://sonarcloud.io/api/project_badges/measure?project=chrootlogin_go-wiki&metric=alert_status)
+
 A wiki software written in Go.
 
 ## Download
