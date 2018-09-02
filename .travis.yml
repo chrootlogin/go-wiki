@@ -31,7 +31,7 @@ jobs:
 
     script:
     - sonar-scanner
-    - make
+    - make dependencies test go_app
 
     deploy:
     - provider: script
