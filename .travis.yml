@@ -12,6 +12,12 @@ jobs:
     go: 1.10.x
     node_js: lts/*
 
+    addons:
+      sonarcloud:
+        organization: chrootlogin-github
+        token:
+          secure: PF0uZsYywyWbKOaLM6tZ0D9RLGRcq35Yt9wqSvqCLhInQiMO76Octe/UpH5TXRVeMXqIyzwIO9jladebaHug/wBzw4Bdpbk/vnhAAMKLoPJJkExoF55tQ4ex9yZ+4wXuHVX56LR4gA8MiMTZmzNGikYLTv22IjT5p2jd5O5vLLjwvPm7GTxVLAYQKUscw7DG+ojVvKRjKwKUH1AL89newm+V1iTxHM0g0cZ585Ayp6W69pwf4fpIl/ldFBFbwfwxnm7yrPfFB7m/y2ZAWkHoJIiwXwXXchQ4cs/fTLk2A0v1CXA1jZH4BAJHUbZXGLlVrRmy7uEy8YC2wnMUPLgYrmUF0luNbG9KjRgkeleW1osHQZHDD7JLbblQulBtX8eEgCPoNMD6FdC32Ee+SmD2XhvOw+S97VLtRpTxdCSt391pp13TY49zK1Eln9sive6FLWrTbFZ03KWJSJbIaFfMuwMOYEREM/2GZwput/4KnwG/TkaDMI9Xz0HzWyzb9Sx9+rv0LtSqBP3N7WYN7IafUg12PjOH78zxU56nyVPcSgFC8HOhpBwDWqYY/PZf0bZK8ulepUWk7MbhiEYCuYmir2NnuX53Ribf3uYUktrpd0mQk0vjtM5sU4M/iBdKfNTgGdM1gjxx5ltxoyPxUfZddsz6wmEN8a88eAV7rxbwUYU=
+
     cache:
       directories:
       - vendor
@@ -24,6 +30,7 @@ jobs:
     - # skip
 
     script:
+    - sonar-scanner
     - make
 
     deploy:
