@@ -4,8 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
 func TestConfig(t *testing.T) {
@@ -48,6 +49,6 @@ func TestConfigList_Set(t *testing.T) {
 func TestConfigList_GetDefault(t *testing.T) {
 	assert := assert.New(t)
 
-	testkey := Config().GetDefault("not-existing-test-key","a-test-value")
+	testkey := Config().GetDefault("not-existing-test-key", "a-test-value")
 	assert.Equal("a-test-value", testkey)
 }

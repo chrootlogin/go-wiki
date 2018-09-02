@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
@@ -29,7 +30,7 @@ func TestUserList_Add(t *testing.T) {
 
 	newUser := common.User{
 		Username: "test-user",
-		Email: "test@example.org",
+		Email:    "test@example.org",
 	}
 
 	err := UserList().Add(newUser)
