@@ -5,10 +5,8 @@ import (
 	"errors"
 	"encoding/json"
 
-	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-billy.v4"
 
-	"github.com/chrootlogin/go-wiki/src/lib/repo"
 	"gopkg.in/src-d/go-billy.v4/osfs"
 	"log"
 	"path/filepath"
@@ -30,10 +28,8 @@ type Metadata struct {
 	Permissions map[string][]string `json:"permissions"`
 }
 
-type filesystem struct {
-	Repository *git.Repository
+type Filesystem struct {
 	Filesystem billy.Filesystem
-	Worktree *git.Worktree
 	Error error
 	FilePermissionMode os.FileMode
 	ChrootDirectory string
@@ -66,26 +62,14 @@ func initDataDir() {
 	}
 }
 
-func New(options ...Option) *filesystem {
+func New(options ...Option) *Filesystem {
 	// set default values
-	var fs = &filesystem{
-		Repository: repo.GetRepo(),
+	var fs = &Filesystem{
 		FilePermissionMode: 0644,
 		ChrootDirectory: "",
 		WithMetadata: false,
 		Filesystem: osfs.New(dataPath),
 	}
-
-	// init worktree
-	/* wt, err := fs.Repository.Worktree()
-	if err != nil {
-		fs.Error = err;
-		// return broken fs, error will be catched in chained function
-		return fs
-	} */
-
-	//fs.Worktree = wt
-	//fs.Filesystem = wt.Filesystem
 
 	// run options
 	for _, option := range options {
@@ -98,7 +82,16 @@ func New(options ...Option) *filesystem {
 	return fs
 }
 
-func (fs *filesystem) Has(path string) (bool, error) {
+func (fs *Filesystem) Stat(path string) (os.FileInfo, error) {
+	// check for error
+	if fs.Error != nil {
+		return nil, fs.Error
+	}
+
+	return fs.Filesystem.Stat(path)
+}
+
+func (fs *Filesystem) Has(path string) (bool, error) {
 	// check for error
 	if fs.Error != nil {
 		return false, fs.Error
@@ -113,7 +106,7 @@ func (fs *filesystem) Has(path string) (bool, error) {
 	return true, nil
 }
 
-func (fs *filesystem) List(path string) ([]os.FileInfo, error) {
+func (fs *Filesystem) List(path string) ([]os.FileInfo, error) {
 	// check for error
 	if fs.Error != nil {
 		return []os.FileInfo{}, fs.Error
@@ -132,7 +125,7 @@ func (fs *filesystem) List(path string) ([]os.FileInfo, error) {
 	return fs.Filesystem.ReadDir(path)
 }
 
-func (fs *filesystem) Get(path string) (*File, error) {
+func (fs *Filesystem) Get(path string) (*File, error) {
 	// check for error
 	if fs.Error != nil {
 		return nil, fs.Error
@@ -175,7 +168,7 @@ func (fs *filesystem) Get(path string) (*File, error) {
 	return file, nil
 }
 
-func (fs *filesystem) Save(path string, file File) error {
+func (fs *Filesystem) Save(path string, file File) error {
 	// check for error
 	if fs.Error != nil {
 		return fs.Error
@@ -185,29 +178,6 @@ func (fs *filesystem) Save(path string, file File) error {
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func (fs *filesystem) Commit(path string, file File, commit Commit) error {
-	/*// check for error
-	if fs.Error != nil {
-		return fs.Error
-	}
-
-	err := commitFile(fs, path, []byte(file.Content), commit)
-	if err != nil {
-		return err
-	}
-
-	if fs.WithMetadata {
-		metadata, err := json.Marshal(file.Metadata)
-		if err != nil {
-			return err
-		}
-
-		return commitFile(fs, path + ".meta", metadata, commit)
-	}*/
 
 	return nil
 }

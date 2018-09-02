@@ -1,4 +1,4 @@
-package filesystem
+package pagestore
 
 import "github.com/chrootlogin/go-wiki/src/lib/common"
 

@@ -71,10 +71,10 @@ func PostPageHandler(c *gin.Context) {
 		// add default permissions for author: "read, write, admin"
 		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
 
-		err := fs.Commit(path, file, filesystem.Commit{
+		/*err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Created page: " + path,
-		})
+		})*/
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return
@@ -138,11 +138,11 @@ func GetPageHandler(c *gin.Context) {
 
 // UPDATE
 func PutPageHandler(c *gin.Context) {
-	user, exists := helper.GetClientUser(c)
+	/*user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return
-	}
+	}*/
 
 	path := c.Param("path")
 
@@ -169,10 +169,10 @@ func PutPageHandler(c *gin.Context) {
 			return
 		}
 
-		err := fs.Commit(path, file, filesystem.Commit{
+		/*err := fs.Commit(path, file, filesystem.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
-		})
+		})*/
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
 			return

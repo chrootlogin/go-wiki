@@ -10,10 +10,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"time"
 	"os"
-	"github.com/chrootlogin/go-wiki/src/lib/helper"
-		"bytes"
+	"bytes"
 	"io"
-	"path/filepath"
 )
 
 type apiResponse struct {
@@ -76,7 +74,7 @@ func ListFolderHandler(c *gin.Context) {
 
 // Upload
 func PostFileHandler(c *gin.Context) {
-	path := c.Param("path")
+	/*path := c.Param("path")
 
 	// Init Filesystem
 	fs := filesystem.New(filesystem.WithChroot("pages"))
@@ -86,7 +84,7 @@ func PostFileHandler(c *gin.Context) {
 	if !exists {
 		helper.Unauthorized(c)
 		return
-	}
+	}*/
 
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -116,7 +114,7 @@ func PostFileHandler(c *gin.Context) {
 		f.Close()
 
 		// Save file to folder
-		err = fs.Commit(filepath.Join(path, file.Filename), filesystem.File{
+		/*err = fs.Commit(filepath.Join(path, file.Filename), filesystem.File{
 			Content: string(buf.Bytes()),
 		}, filesystem.Commit{
 			Message: fmt.Sprintf("Uploaded file %s", file.Filename),
@@ -125,7 +123,7 @@ func PostFileHandler(c *gin.Context) {
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
-		}
+		}*/
 
 		fileCount++
 	}

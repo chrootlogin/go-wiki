@@ -1,9 +1,9 @@
 package filesystem
 
-type Option func(*filesystem) error
+type Option func(*Filesystem) error
 
 func WithChroot(chrootDir string) Option {
-	return func(fs *filesystem) error {
+	return func(fs *Filesystem) error {
 		newFs, err := fs.Filesystem.Chroot(chrootDir)
 		if err != nil {
 			return err
@@ -17,7 +17,7 @@ func WithChroot(chrootDir string) Option {
 }
 
 func WithMetadata() Option {
-	return func(fs *filesystem) error {
+	return func(fs *Filesystem) error {
 		fs.WithMetadata = true
 
 		return nil

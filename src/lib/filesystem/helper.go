@@ -3,15 +3,10 @@ package filesystem
 import (
 	"os"
 	"log"
-	"time"
-	"path/filepath"
 	"io/ioutil"
-
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
+func readFile(fs *Filesystem, path string) ([]byte, os.FileInfo, error) {
 	// Get FileInfo
 	fileinfo, err := fs.Filesystem.Stat(path)
 	if err != nil {
@@ -46,7 +41,7 @@ func readFile(fs *filesystem, path string) ([]byte, os.FileInfo, error) {
 	return data, fileinfo, nil
 }
 
-func saveFile(fs *filesystem, path string, data []byte) error {
+func saveFile(fs *Filesystem, path string, data []byte) error {
 	// Open file
 	file, err := fs.Filesystem.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fs.FilePermissionMode)
 	if err != nil {
@@ -65,40 +60,6 @@ func saveFile(fs *filesystem, path string, data []byte) error {
 	err = file.Close()
 	if err != nil {
 		log.Println("close file: " + err.Error())
-		return err
-	}
-
-	return nil
-}
-
-func commitFile(fs *filesystem, path string, data []byte, commit Commit) error {
-	err := saveFile(fs, path, data)
-	if err != nil {
-		return err
-	}
-
-	// Add file, and use chroot if needed
-	if len(fs.ChrootDirectory) > 0 {
-		_, err = fs.Worktree.Add(filepath.Join(fs.ChrootDirectory, path))
-	} else {
-		_, err = fs.Worktree.Add(path)
-	}
-	if err != nil {
-		log.Println("adding file: " + err.Error())
-		return err
-	}
-
-	// Creating commit
-	_, err = fs.Worktree.Commit(commit.Message, &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  commit.Author.Username,
-			Email: commit.Author.Email,
-			When:  time.Now(),
-		},
-	})
-
-	if err != nil {
-		log.Println("commit: " + err.Error())
 		return err
 	}
 
