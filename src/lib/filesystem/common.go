@@ -158,16 +158,8 @@ func (fs *Filesystem) Get(path string) (*File, error) {
 	// check if file is cached
 	f, exists := filesystemCache.Get(cachePath)
 	if exists {
-		// convert
-		file, ok := f.(*File)
-		if !ok {
-			return nil, errors.New("cached file corrupt")
-		}
-
-		// return cached copy
-		if file != nil {
-			return file, nil
-		}
+		// convert and return
+		return f.(*File), nil
 	}
 
 	data, fileinfo, err := readFile(fs, path)
