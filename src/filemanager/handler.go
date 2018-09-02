@@ -12,7 +12,9 @@ import (
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
+	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
+	"path/filepath"
 )
 
 type apiResponse struct {
@@ -72,17 +74,14 @@ func ListFolderHandler(c *gin.Context) {
 
 // Upload
 func PostFileHandler(c *gin.Context) {
-	/*path := c.Param("path")
-
-	// Init Filesystem
-	fs := filesystem.New(filesystem.WithChroot("pages"))
+	path := c.Param("path")
 
 	// Get user
 	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return
-	}*/
+	}
 
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -112,16 +111,16 @@ func PostFileHandler(c *gin.Context) {
 		f.Close()
 
 		// Save file to folder
-		/*err = fs.Commit(filepath.Join(path, file.Filename), filesystem.File{
+		err = pagestore.New().Commit(filepath.Join(path, file.Filename), filesystem.File{
 			Content: string(buf.Bytes()),
-		}, filesystem.Commit{
+		}, pagestore.Commit{
 			Message: fmt.Sprintf("Uploaded file %s", file.Filename),
-			Author: user,
+			Author:  user,
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
-		}*/
+		}
 
 		fileCount++
 	}
