@@ -14,6 +14,7 @@ go_app:
 	$(GOLANG) build -o go-wiki main.go
 
 test:
+	find . -type d -iname data -prune -exec rm -rf '{}' '+'
 	$(GOLANG) test ./...
 	find . -type d -iname data -prune -exec rm -rf '{}' '+'
 
