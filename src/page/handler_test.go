@@ -13,19 +13,34 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 )
 
-func setupTestCase(t *testing.T) func(t *testing.T) {
-	t.Log("setup test case")
-	return func(t *testing.T) {
-		t.Log("teardown test case")
-	}
+func TestGetPageHandler(t *testing.T) {
+	assert := assert.New(t)
+
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.GET("/api/page/*path", GetPageHandler)
+
+	req, _ := http.NewRequest("GET", "/api/page/", nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(http.StatusOK, w.Code)
 }
 
-func setupSubTest(t *testing.T) func(t *testing.T) {
-	t.Log("setup sub test")
-	return func(t *testing.T) {
-		t.Log("teardown sub test")
-	}
+func TestGetPageHandler2(t *testing.T) {
+	assert := assert.New(t)
+
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.GET("/api/page/*path", GetPageHandler)
+
+	req, _ := http.NewRequest("GET", "/api/page/does-not-exist/", nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(http.StatusNotFound, w.Code)
 }
+
 
 func TestPostPageHandler(t *testing.T) {
 	assert := assert.New(t)
