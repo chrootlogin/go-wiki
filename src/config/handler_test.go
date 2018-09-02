@@ -1,16 +1,16 @@
 package config
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-
-	"encoding/json"
-	"io/ioutil"
 	"github.com/stretchr/testify/assert"
-	"reflect"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 

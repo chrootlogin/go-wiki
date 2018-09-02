@@ -11,7 +11,7 @@ func TestWithChroot(t *testing.T) {
 
 	fs := New(WithChroot("prefs"))
 
-	assert.Equal(fs.ChrootDirectory,"prefs")
+	assert.Equal(fs.ChrootDirectory, "prefs")
 
 	file := File{
 		Content: "A test file",

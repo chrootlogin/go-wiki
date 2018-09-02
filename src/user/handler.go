@@ -1,17 +1,17 @@
 package user
 
 import (
-		"fmt"
 	"errors"
-	"regexp"
+	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/badoux/checkmail"
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/store"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
+	"github.com/chrootlogin/go-wiki/src/lib/store"
 )
 
 type apiRequest struct {
@@ -47,8 +47,8 @@ func RegisterHandler(c *gin.Context) {
 		}
 
 		user := common.User{
-			Username: data.Username,
-			Email: data.Email,
+			Username:     data.Username,
+			Email:        data.Email,
 			PasswordHash: passwordHash,
 		}
 
@@ -83,8 +83,8 @@ func GetUserHandler(c *gin.Context) {
 	}
 
 	resp := apiResponse{
-		Username: user.Username,
-		Email: user.Email,
+		Username:    user.Username,
+		Email:       user.Email,
 		Permissions: user.Permissions,
 	}
 

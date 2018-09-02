@@ -1,8 +1,9 @@
 package store
 
 import (
-	"testing"
 	"reflect"
+	"testing"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 

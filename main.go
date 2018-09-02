@@ -1,22 +1,22 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"log"
-	"syscall"
+	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/chrootlogin/event"
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
-	"github.com/chrootlogin/go-wiki/src/page"
-	"github.com/chrootlogin/go-wiki/src/user"
 	"github.com/chrootlogin/go-wiki/src/auth"
 	"github.com/chrootlogin/go-wiki/src/config"
-	"github.com/chrootlogin/go-wiki/src/lib/plugins"
 	"github.com/chrootlogin/go-wiki/src/filemanager"
+	"github.com/chrootlogin/go-wiki/src/lib/plugins"
+	"github.com/chrootlogin/go-wiki/src/page"
+	"github.com/chrootlogin/go-wiki/src/user"
 )
 
 var port = ""

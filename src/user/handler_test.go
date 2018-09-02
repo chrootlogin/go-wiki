@@ -1,14 +1,16 @@
 package user
 
 import (
-	"github.com/stretchr/testify/assert"
-	"net/http/httptest"
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"testing"
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"bytes"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/chrootlogin/go-wiki/src/lib/store"
 )
 
@@ -39,7 +41,7 @@ func TestRegisterHandler(t *testing.T) {
 	assert := assert.New(t)
 
 	type Test struct {
-		apiReq apiRequest
+		apiReq       apiRequest
 		expectedCode int
 	}
 
@@ -48,7 +50,7 @@ func TestRegisterHandler(t *testing.T) {
 			apiReq: apiRequest{
 				Username: "testuser1",
 				Password: "admin12345",
-				Email: "test@example.org",
+				Email:    "test@example.org",
 			},
 			expectedCode: http.StatusCreated,
 		},
@@ -56,7 +58,7 @@ func TestRegisterHandler(t *testing.T) {
 			apiReq: apiRequest{
 				Username: "testuser1",
 				Password: "admin12345",
-				Email: "test@example.org",
+				Email:    "test@example.org",
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -64,7 +66,7 @@ func TestRegisterHandler(t *testing.T) {
 			apiReq: apiRequest{
 				Username: "test*ç%user2",
 				Password: "admin12345",
-				Email: "test@example.org",
+				Email:    "test@example.org",
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -72,14 +74,14 @@ func TestRegisterHandler(t *testing.T) {
 			apiReq: apiRequest{
 				Username: "testuser2",
 				Password: "admin12345",
-				Email: "test@exam@*ple.org",
+				Email:    "test@exam@*ple.org",
 			},
 			expectedCode: http.StatusBadRequest,
 		},
 	}
 
 	// enable registration
-	err := store.Config().Set("registration","1")
+	err := store.Config().Set("registration", "1")
 	if assert.NoError(err) {
 
 		for _, test := range tests {

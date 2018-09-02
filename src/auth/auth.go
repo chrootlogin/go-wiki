@@ -1,26 +1,26 @@
 package auth
 
 import (
-	"os"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"strings"
 	"time"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/store"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
+	"github.com/chrootlogin/go-wiki/src/lib/store"
 )
 
 type AuthMiddleware struct {
-	Realm string
-	Key []byte
+	Realm            string
+	Key              []byte
 	SigningAlgorithm *jwt.SigningMethodHMAC
-	Timeout time.Duration
+	Timeout          time.Duration
 }
 
 // Login form structure.
@@ -36,11 +36,11 @@ func GetAuthMiddleware() *AuthMiddleware {
 		log.Fatal("Env variable 'SESSION_KEY' must be specified")
 	}
 
-	return &AuthMiddleware {
-		Realm: "gowiki",
-		Key: []byte(signingKey),
+	return &AuthMiddleware{
+		Realm:            "gowiki",
+		Key:              []byte(signingKey),
 		SigningAlgorithm: jwt.SigningMethodHS512,
-		Timeout: time.Hour * 24,
+		Timeout:          time.Hour * 24,
 	}
 }
 
@@ -65,7 +65,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			})
 
 			if err != nil {
-				c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
+				c.Header("WWW-Authenticate", "JWT realm="+am.Realm)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, common.ApiResponse{Message: err.Error()})
 				return
 			}
@@ -76,7 +76,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			// check if user exits
 			user, err = store.UserList().Get(userId)
 			if err != nil {
-				c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
+				c.Header("WWW-Authenticate", "JWT realm="+am.Realm)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, common.ApiResponse{Message: err.Error()})
 				return
 			}
@@ -87,7 +87,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 
 		// if not logged in and trying to do a changing action
 		if !loggedIn && (c.Request.Method == "POST" || c.Request.Method == "PUT" || c.Request.Method == "DELETE") {
-			c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
+			c.Header("WWW-Authenticate", "JWT realm="+am.Realm)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, common.ApiResponse{Message: "You need to be logged in to perform this action."})
 			return
 		}
@@ -108,7 +108,7 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 	var loginData ApiLogin
 
 	if c.BindJSON(&loginData) != nil {
-		c.JSON(http.StatusBadRequest,  common.ApiResponse{Message:"Missing Username or Password"})
+		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: "Missing Username or Password"})
 		return
 	}
 
@@ -125,8 +125,8 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 	}
 
 	if loginIsError {
-		c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
-		c.JSON(http.StatusUnauthorized,  common.ApiResponse{Message:"Wrong Username or Password"})
+		c.Header("WWW-Authenticate", "JWT realm="+am.Realm)
+		c.JSON(http.StatusUnauthorized, common.ApiResponse{Message: "Wrong Username or Password"})
 		return
 	}
 
@@ -141,8 +141,8 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 
 	tokenString, err := token.SignedString(am.Key)
 	if err != nil {
-		c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
-		c.JSON(http.StatusUnauthorized,  common.ApiResponse{Message:"Creating JWT token failed!"})
+		c.Header("WWW-Authenticate", "JWT realm="+am.Realm)
+		c.JSON(http.StatusUnauthorized, common.ApiResponse{Message: "Creating JWT token failed!"})
 		log.Println(err)
 		return
 	}

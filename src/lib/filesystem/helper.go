@@ -1,9 +1,10 @@
 package filesystem
 
 import (
-	"os"
-	"log"
 	"io/ioutil"
+	"log"
+	"os"
+
 	"gopkg.in/src-d/go-billy.v4"
 )
 

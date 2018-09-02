@@ -1,22 +1,22 @@
 package filemanager
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
-	"time"
-	"os"
-	"bytes"
-	"io"
 )
 
 type apiResponse struct {
 	Files []fileResponse `json:"files"`
-	Path  string		 `json:"path"`
+	Path  string         `json:"path"`
 }
 
 type fileResponse struct {
@@ -36,24 +36,24 @@ func ListFolderHandler(c *gin.Context) {
 	dirContent, err := fs.List(path)
 	if err != nil {
 		if err == filesystem.ErrIsFile {
-			c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{ Message: fmt.Sprintf("Path '%s' is not a directory!", path)})
+			c.AbortWithStatusJSON(http.StatusBadRequest, common.ApiResponse{Message: fmt.Sprintf("Path '%s' is not a directory!", path)})
 			return
 		}
 
 		if os.IsNotExist(err) {
-			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{ Message: fmt.Sprintf("Path '%s' not found!", path)})
+			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{Message: fmt.Sprintf("Path '%s' not found!", path)})
 			return
 		}
 
-		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 		return
 	}
 
 	var files []fileResponse
 	for _, file := range dirContent {
 		f := fileResponse{
-			Name: file.Name(),
-			Size: file.Size(),
+			Name:    file.Name(),
+			Size:    file.Size(),
 			ModTime: file.ModTime().Format(time.RFC1123),
 		}
 
@@ -68,7 +68,7 @@ func ListFolderHandler(c *gin.Context) {
 
 	c.JSON(200, apiResponse{
 		Files: files,
-		Path: path,
+		Path:  path,
 	})
 }
 

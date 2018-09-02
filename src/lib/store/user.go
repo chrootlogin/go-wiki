@@ -16,10 +16,6 @@ type userList struct {
 	Error error
 }
 
-/*func (u *UserList) GetAll() map[string]common.User {
-	return u.Users
-}*/
-
 func (ul *userList) Get(username string) (common.User, error) {
 	// check for error
 	if ul.Error != nil {

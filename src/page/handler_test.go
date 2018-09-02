@@ -1,14 +1,15 @@
 package page
 
 import (
-	"testing"
-	"net/http/httptest"
-	"net/http"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 )
@@ -40,7 +41,6 @@ func TestGetPageHandler2(t *testing.T) {
 
 	assert.Equal(http.StatusNotFound, w.Code)
 }
-
 
 func TestPostPageHandler(t *testing.T) {
 	assert := assert.New(t)

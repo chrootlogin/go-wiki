@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 // Original author: https://github.com/orirawlings, https://github.com/src-d/go-git/issues/562#issuecomment-324819816

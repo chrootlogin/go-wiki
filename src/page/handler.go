@@ -1,20 +1,20 @@
 package page
 
 import (
+	"net/http"
 	"os"
 	"time"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/imdario/mergo"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/patrickmn/go-cache"
 	"github.com/russross/blackfriday"
-	"github.com/microcosm-cc/bluemonday"
-	"github.com/imdario/mergo"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
+	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
 )
 
 var (
@@ -26,7 +26,7 @@ type apiRequest struct {
 }
 
 type apiResponse struct {
-	Title 	     string `json:"title,omitempty"`
+	Title        string `json:"title,omitempty"`
 	Content      string `json:"content,omitempty"`
 	Path         string `json:"path,omitempty"`
 	LastModified string `json:"last-modified,omitempty"`
@@ -49,11 +49,11 @@ func PostPageHandler(c *gin.Context) {
 	ps := pagestore.New()
 	has, err := ps.Has(path)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 		return
 	}
 	if has {
-		c.JSON(http.StatusNotFound, common.ApiResponse{ Message: "File found, use PUT to update." })
+		c.JSON(http.StatusNotFound, common.ApiResponse{Message: "File found, use PUT to update."})
 		return
 	}
 
@@ -70,14 +70,14 @@ func PostPageHandler(c *gin.Context) {
 		}
 
 		// add default permissions for author: "read, write, admin"
-		file.Metadata.Permissions["u:" + user.Username] = []string{"r", "w", "a"}
+		file.Metadata.Permissions["u:"+user.Username] = []string{"r", "w", "a"}
 
 		err := ps.Commit(path, file, pagestore.Commit{
-			Author: user,
+			Author:  user,
 			Message: "Created page: " + path,
 		})
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
 		}
 
@@ -113,13 +113,13 @@ func GetPageHandler(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		c.JSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 		return
 	}
 
 	lastModified := file.FileInfo.ModTime().Format(time.RFC1123)
 	var response = apiResponse{
-		Path: path,
+		Path:         path,
 		LastModified: lastModified,
 	}
 
@@ -150,11 +150,11 @@ func PutPageHandler(c *gin.Context) {
 	oldFile, err := pagestore.New().Get(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
+			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{Message: "Not found, use POST to create."})
 			return
 		}
 
-		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 		return
 	}
 
@@ -165,16 +165,16 @@ func PutPageHandler(c *gin.Context) {
 		}
 
 		if err := mergo.Merge(&file, oldFile); err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
 		}
 
 		err := pagestore.New().Commit(path, file, pagestore.Commit{
-			Author: user,
+			Author:  user,
 			Message: "Updated page: " + path,
 		})
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{ Message: err.Error() })
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: err.Error()})
 			return
 		}
 

@@ -1,31 +1,32 @@
 package filesystem
 
 import (
-	"os"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"path/filepath"
+	"time"
 
+	"github.com/gin-gonic/gin/json"
+	"github.com/patrickmn/go-cache"
 	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/osfs"
+
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"github.com/gin-gonic/gin/json"
-	"fmt"
-	"github.com/patrickmn/go-cache"
-	"time"
 )
 
 const DEFAULT_FILE_PERMISSIONS = 0644
 
 var (
-	ErrIsDir = errors.New("is a directory")
-	ErrIsFile = errors.New("is a file")
-	dataPath = ""
+	ErrIsDir        = errors.New("is a directory")
+	ErrIsFile       = errors.New("is a file")
+	dataPath        = ""
 	filesystemCache *cache.Cache
 )
 
 type File struct {
-	Content string
+	Content  string
 	Metadata Metadata
 	FileInfo os.FileInfo
 }
@@ -35,10 +36,10 @@ type Metadata struct {
 }
 
 type Filesystem struct {
-	Filesystem billy.Filesystem
-	Error error
+	Filesystem         billy.Filesystem
+	Error              error
 	FilePermissionMode os.FileMode
-	ChrootDirectory string
+	ChrootDirectory    string
 }
 
 func init() {
@@ -54,7 +55,7 @@ func init() {
 		log.Println("Environment variable DATA_DIR is empty")
 	}
 
-	log.Println(fmt.Sprintf("Using data directory: %s",dataPath))
+	log.Println(fmt.Sprintf("Using data directory: %s", dataPath))
 
 	initDataDir()
 	filesystemCache = cache.New(30*time.Minute, 10*time.Minute)
@@ -84,8 +85,8 @@ func New(options ...Option) *Filesystem {
 	// set default values
 	var fs = &Filesystem{
 		FilePermissionMode: DEFAULT_FILE_PERMISSIONS,
-		ChrootDirectory: "",
-		Filesystem: osfs.New(dataPath),
+		ChrootDirectory:    "",
+		Filesystem:         osfs.New(dataPath),
 	}
 
 	// run options
@@ -175,7 +176,7 @@ func (fs *Filesystem) Get(path string) (*File, error) {
 	}
 
 	file := &File{
-		Content: string(data),
+		Content:  string(data),
 		FileInfo: fileinfo,
 	}
 
