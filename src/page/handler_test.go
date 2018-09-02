@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
+	"fmt"
 )
 
 func TestPostPageHandler(t *testing.T) {
@@ -43,10 +44,51 @@ func TestPostPageHandler(t *testing.T) {
 	}
 }
 
+func TestPutPageHandler(t *testing.T) {
+	assert := assert.New(t)
+
+	apiReq := apiRequest{
+		Content: "This is a nicer test page!",
+	}
+
+	data, err := json.Marshal(apiReq)
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.PUT("/api/page/*path", loginPutPageHandler)
+
+		req, _ := http.NewRequest("PUT", "/api/page/a-new-test.md", bytes.NewReader(data))
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Length", string(len(data)))
+		r.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Error(w.Body)
+		}
+	}
+
+	f, err := pagestore.New().Get("a-new-test.md")
+
+	if assert.NoError(err) {
+
+		fmt.Println(f.Content)
+		assert.Equal(apiReq.Content, f.Content)
+	}
+}
+
 func loginPostPageHandler(c *gin.Context) {
 	c.Set("user", common.User{
 		Username: "testuser",
 	})
 
 	PostPageHandler(c)
+}
+
+func loginPutPageHandler(c *gin.Context) {
+	c.Set("user", common.User{
+		Username: "testuser",
+	})
+
+	PutPageHandler(c)
 }

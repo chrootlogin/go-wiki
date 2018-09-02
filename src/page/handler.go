@@ -9,6 +9,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/russross/blackfriday"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/imdario/mergo"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
@@ -137,7 +138,7 @@ func GetPageHandler(c *gin.Context) {
 }
 
 // UPDATE
-/*func PutPageHandler(c *gin.Context) {
+func PutPageHandler(c *gin.Context) {
 	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
@@ -146,8 +147,7 @@ func GetPageHandler(c *gin.Context) {
 
 	path := c.Param("path")
 
-	fs := filesystem.New(filesystem.WithChroot("pages"), filesystem.WithMetadata())
-	oldFile, err := fs.Get(path)
+	oldFile, err := pagestore.New().Get(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.AbortWithStatusJSON(http.StatusNotFound, common.ApiResponse{ Message: "Not found, use POST to create." })
@@ -169,7 +169,7 @@ func GetPageHandler(c *gin.Context) {
 			return
 		}
 
-		err := fs.Commit(path, file, filesystem.Commit{
+		err := pagestore.New().Commit(path, file, pagestore.Commit{
 			Author: user,
 			Message: "Updated page: " + path,
 		})
@@ -187,7 +187,6 @@ func GetPageHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})
 	}
 }
-*/
 
 // GET A PREVIEW
 func PostPreviewHandler(c *gin.Context) {
