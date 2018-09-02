@@ -12,6 +12,9 @@ jobs:
     go: 1.11.x
     node_js: lts/*
 
+    git:
+      depth: false
+
     addons:
       sonarcloud:
         organization: chrootlogin-github
