@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chrootlogin/go-wiki/src/page"
-	"io/ioutil"
 )
 
 func TestGetAuthMiddleware(t *testing.T) {
@@ -156,7 +156,7 @@ func TestAuthMiddleware_MiddlewareFunc2(t *testing.T) {
 						req, _ := http.NewRequest("POST", "/api/page/new-page.md", bytes.NewReader(data))
 						req.Header.Add("Content-Type", "application/json")
 						req.Header.Add("Content-Length", string(len(data)))
-						req.Header.Add("Authorization", "Bearer " + resp["token"])
+						req.Header.Add("Authorization", "Bearer "+resp["token"])
 						r.ServeHTTP(w, req)
 
 						assert.Equal(http.StatusCreated, w.Code)
