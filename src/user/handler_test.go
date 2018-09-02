@@ -8,6 +8,8 @@ import (
 	"testing"
 	"encoding/json"
 	"io/ioutil"
+	"bytes"
+	"github.com/chrootlogin/go-wiki/src/lib/store"
 )
 
 func TestGetUserHandler(t *testing.T) {
@@ -28,6 +30,74 @@ func TestGetUserHandler(t *testing.T) {
 			err = json.Unmarshal(data, &resp)
 			if assert.NoError(err) {
 				assert.Equal("admin", resp.Username)
+			}
+		}
+	}
+}
+
+func TestRegisterHandler(t *testing.T) {
+	assert := assert.New(t)
+
+	type Test struct {
+		apiReq apiRequest
+		expectedCode int
+	}
+
+	tests := []Test{
+		{
+			apiReq: apiRequest{
+				Username: "testuser1",
+				Password: "admin12345",
+				Email: "test@example.org",
+			},
+			expectedCode: http.StatusCreated,
+		},
+		{
+			apiReq: apiRequest{
+				Username: "testuser1",
+				Password: "admin12345",
+				Email: "test@example.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			apiReq: apiRequest{
+				Username: "test*ç%user2",
+				Password: "admin12345",
+				Email: "test@example.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			apiReq: apiRequest{
+				Username: "testuser2",
+				Password: "admin12345",
+				Email: "test@exam@*ple.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+	}
+
+	// enable registration
+	err := store.Config().Set("registration","1")
+	if assert.NoError(err) {
+
+		for _, test := range tests {
+			t.Log(test.apiReq)
+
+			data, err := json.Marshal(test.apiReq)
+			if assert.NoError(err) {
+				w := httptest.NewRecorder()
+
+				r := gin.Default()
+				r.POST("/user/register", RegisterHandler)
+
+				req, _ := http.NewRequest("POST", "/user/register", bytes.NewReader(data))
+				req.Header.Add("Content-Type", "application/json")
+				req.Header.Add("Content-Length", string(len(data)))
+				r.ServeHTTP(w, req)
+
+				assert.Equal(test.expectedCode, w.Code)
 			}
 		}
 	}

@@ -15,7 +15,7 @@ import (
 )
 
 type apiRequest struct {
-	Name     string `json:"username"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
 }
@@ -28,14 +28,14 @@ type apiResponse struct {
 
 func RegisterHandler(c *gin.Context) {
 	// check if registration is enabled
-	if !store.Config().Registration {
+	if store.Config().GetDefault("registration", "1") != "1" {
 		helper.Forbidden("Registration is disabled!", c)
 		return
 	}
 
 	var data apiRequest
 	if c.BindJSON(&data) == nil {
-		if err := validateNewUser(data.Name, data.Password, data.Email); err != nil {
+		if err := validateNewUser(data.Username, data.Password, data.Email); err != nil {
 			c.JSON(http.StatusBadRequest, common.ApiResponse{Message: err.Error()})
 			return
 		}
@@ -47,7 +47,7 @@ func RegisterHandler(c *gin.Context) {
 		}
 
 		user := common.User{
-			Username: data.Name,
+			Username: data.Username,
 			Email: data.Email,
 			PasswordHash: passwordHash,
 		}
@@ -59,7 +59,7 @@ func RegisterHandler(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusCreated, common.ApiResponse{
-			Message: fmt.Sprintf("The user %v was created.", data.Name),
+			Message: fmt.Sprintf("The user %v was created.", data.Username),
 		})
 	} else {
 		c.JSON(http.StatusBadRequest, common.ApiResponse{Message: common.WrongAPIUsageError})

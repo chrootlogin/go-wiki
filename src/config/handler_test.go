@@ -7,13 +7,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/chrootlogin/go-wiki/src/lib/common"
 	"encoding/json"
 	"io/ioutil"
+	"github.com/stretchr/testify/assert"
 	"reflect"
+	"github.com/chrootlogin/go-wiki/src/lib/common"
 )
 
 func TestGetConfigHandler(t *testing.T) {
+	assert := assert.New(t)
+
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
@@ -23,17 +26,13 @@ func TestGetConfigHandler(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	body, err := ioutil.ReadAll(w.Body)
-	if err != nil {
-		t.Error(err)
-	}
-
-	var readConfiguration common.Configuration
-	err = json.Unmarshal(body, &readConfiguration)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if !reflect.DeepEqual(common.DefaultFiles["prefs/_config.json"], readConfiguration) {
-		t.Error("Default configuration is not equal.")
+	if assert.NoError(err) {
+		var readConfiguration map[string]string
+		err = json.Unmarshal(body, &readConfiguration)
+		if assert.NoError(err) {
+			if !reflect.DeepEqual(common.DefaultFiles["prefs/_config.json"], readConfiguration) {
+				t.Error("Default configuration is not equal.")
+			}
+		}
 	}
 }

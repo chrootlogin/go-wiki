@@ -1,9 +1,9 @@
 package common
 
 var DefaultFiles = map[string]interface{}{
-	"prefs/_config.json": Configuration {
-		Title: "Go-Wiki",
-		Registration: false,
+	"prefs/_config.json": map[string]string{
+		"title": "Go-Wiki",
+		"registration": "0",
 	},
 	"prefs/_users.json": map[string]User{
 		"admin": {
