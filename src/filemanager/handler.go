@@ -82,7 +82,7 @@ func PostFileHandler(c *gin.Context) {
 	fs := filesystem.New(filesystem.WithChroot("pages"))
 
 	// Get user
-	user, exists := common.GetClientUser(c)
+	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return

@@ -37,7 +37,7 @@ func init() {
 
 // CREATE
 func PostPageHandler(c *gin.Context) {
-	user, exists := common.GetClientUser(c)
+	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return
@@ -138,7 +138,7 @@ func GetPageHandler(c *gin.Context) {
 
 // UPDATE
 func PutPageHandler(c *gin.Context) {
-	user, exists := common.GetClientUser(c)
+	user, exists := helper.GetClientUser(c)
 	if !exists {
 		helper.Unauthorized(c)
 		return

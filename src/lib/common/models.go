@@ -1,5 +1,9 @@
 package common
 
+const (
+	WrongAPIUsageError = "Invalid api call - parameters did not match to method definition"
+)
+
 type User struct {
 	Username     string   `json:"-"`
 	PasswordHash string   `json:"password-hash"`
