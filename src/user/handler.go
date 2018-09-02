@@ -28,7 +28,7 @@ type apiResponse struct {
 
 func RegisterHandler(c *gin.Context) {
 	// check if registration is enabled
-	if !store.GetConfig().Registration {
+	if !store.Config().Registration {
 		helper.Forbidden("Registration is disabled!", c)
 		return
 	}
@@ -52,7 +52,7 @@ func RegisterHandler(c *gin.Context) {
 			PasswordHash: passwordHash,
 		}
 
-		err = store.GetUserList().Add(user)
+		err = store.UserList().Add(user)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, common.ApiResponse{Message: "Unable to register user: " + err.Error()})
 			return
@@ -76,7 +76,7 @@ func GetUserHandler(c *gin.Context) {
 	// remove first character because it's always /
 	userName = trimLeftChar(userName)
 
-	user, err := store.GetUserList().Get(userName)
+	user, err := store.UserList().Get(userName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, common.ApiResponse{Message: fmt.Sprintf("Can't get user list: %s", err.Error())})
 		return
@@ -114,7 +114,7 @@ func validateNewUser(name string, password string, email string) error {
 		return errors.New("The email address is invalid.")
 	}
 
-	_, err = store.GetUserList().Get(name)
+	_, err = store.UserList().Get(name)
 	if err == nil {
 		return errors.New("Sorry, the username '" + name + "' is already taken.")
 	}

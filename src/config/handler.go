@@ -10,5 +10,5 @@ import (
 
 // Read
 func GetConfigHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, store.GetConfig())
+	c.JSON(http.StatusOK, store.Config())
 }

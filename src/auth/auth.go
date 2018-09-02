@@ -74,7 +74,7 @@ func (am *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			userId := claims["id"].(string)
 
 			// check if user exits
-			user, err = store.GetUserList().Get(userId)
+			user, err = store.UserList().Get(userId)
 			if err != nil {
 				c.Header("WWW-Authenticate", "JWT realm=" + am.Realm)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, common.ApiResponse{Message: err.Error()})
@@ -114,7 +114,7 @@ func (am *AuthMiddleware) LoginHandler(c *gin.Context) {
 
 	loginIsError := false
 
-	user, err := store.GetUserList().Get(loginData.Username)
+	user, err := store.UserList().Get(loginData.Username)
 	if err != nil {
 		loginIsError = true
 		log.Println(err.Error())

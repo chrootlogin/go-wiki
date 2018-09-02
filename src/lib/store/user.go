@@ -56,7 +56,7 @@ func (ul *userList) Add(user common.User) error {
 	return nil
 }
 
-func GetUserList() (*userList) {
+func UserList() (*userList) {
 	// check if users are in cache
 	cachedUsers, found := storeCache.Get("users")
 	if found {

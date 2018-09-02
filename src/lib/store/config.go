@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-func GetConfig() (common.Configuration) {
+func Config() (common.Configuration) {
 	configI, found := storeCache.Get("config")
 	if !found {
 		// Load from filesystem
