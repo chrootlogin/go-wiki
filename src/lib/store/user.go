@@ -11,6 +11,8 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
+const USERS_CACHE = "users"
+
 type userList struct {
 	Users map[string]common.User
 	Error error
@@ -50,13 +52,13 @@ func (ul *userList) Add(user common.User) error {
 	}
 
 	// remove users from cache
-	storeCache.Delete("users")
+	storeCache.Set(USERS_CACHE, ul.Users, cache.NoExpiration)
 	return nil
 }
 
 func UserList() *userList {
 	// check if users are in cache
-	cachedUsers, found := storeCache.Get("users")
+	cachedUsers, found := storeCache.Get(USERS_CACHE)
 	if found {
 		ul := &userList{
 			Users: cachedUsers.(map[string]common.User),
@@ -83,7 +85,7 @@ func UserList() *userList {
 	}
 
 	// add to cache with no expiration
-	storeCache.Set("users", users, cache.NoExpiration)
+	storeCache.Set(USERS_CACHE, users, cache.NoExpiration)
 
 	return &userList{
 		Users: users,
