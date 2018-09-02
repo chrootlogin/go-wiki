@@ -14,7 +14,7 @@ go_app:
 	$(GOLANG) build -o go-wiki main.go
 
 test:
-	$(GOLANG) test -json -coverprofile=coverage.out ./... > test-report.out
+	$(GOLANG) test ./...
 
 clean:
 	rm -rf vendor

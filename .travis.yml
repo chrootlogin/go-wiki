@@ -31,7 +31,7 @@ jobs:
 
     script:
     - make dependencies go_bindata
-    - make test
+    - go test -json -coverprofile=coverage.out ./... > test-report.out
     - sonar-scanner
     - make go_app
 
