@@ -37,6 +37,34 @@ func TestListFolderHandler(t *testing.T) {
 	}
 }
 
+func TestListFolderHandler2(t *testing.T) {
+	assert := assert.New(t)
+
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.GET("/api/list/*path", ListFolderHandler)
+
+	req, _ := http.NewRequest("GET", "/api/list/not-existing-path", nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(http.StatusNotFound, w.Code)
+}
+
+func TestListFolderHandler3(t *testing.T) {
+	assert := assert.New(t)
+
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.GET("/api/list/*path", ListFolderHandler)
+
+	req, _ := http.NewRequest("GET", "/api/list/index.md", nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(http.StatusBadRequest, w.Code)
+}
+
 func TestPostFileHandler(t *testing.T) {
 	assert := assert.New(t)
 
