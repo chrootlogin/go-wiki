@@ -65,3 +65,21 @@ func TestFilesystem_Has(t *testing.T) {
 		}
 	}
 }
+
+func TestFilesystem_Stat(t *testing.T) {
+	assert := assert.New(t)
+
+	fileinfo, err := New().Stat("prefs/_config.json")
+	if assert.NoError(err) {
+		assert.False(fileinfo.IsDir())
+	}
+}
+
+func TestFilesystem_List(t *testing.T) {
+	assert := assert.New(t)
+
+	filesinfo, err := New().List("prefs")
+	if assert.NoError(err) {
+		assert.Equal(2, len(filesinfo))
+	}
+}
