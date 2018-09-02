@@ -9,11 +9,15 @@ import (
 	"gopkg.in/src-d/go-billy.v4"
 
 	"github.com/chrootlogin/go-wiki/src/lib/repo"
+	"gopkg.in/src-d/go-billy.v4/osfs"
+	"log"
+	"path/filepath"
 )
 
 var (
 	ErrIsDir = errors.New("is a directory")
 	ErrIsFile = errors.New("is a file")
+	dataPath = ""
 )
 
 type File struct {
@@ -36,6 +40,32 @@ type filesystem struct {
 	WithMetadata bool
 }
 
+func init() {
+	dataPath = os.Getenv("DATA_DIR")
+
+	if len(dataPath) == 0 {
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dataPath = filepath.Join(dir, "data")
+		log.Println("Environment variable DATA_DIR is empty. Using: " + dataPath)
+	} else {
+		log.Println("Using data directory: " + dataPath)
+	}
+
+	initDataDir()
+}
+
+func initDataDir() {
+	if _, err := os.Stat(dataPath); os.IsNotExist(err) {
+		log.Println("Creating new repository...")
+
+		os.Mkdir(dataPath, os.ModePerm)
+	}
+}
+
 func New(options ...Option) *filesystem {
 	// set default values
 	var fs = &filesystem{
@@ -43,18 +73,19 @@ func New(options ...Option) *filesystem {
 		FilePermissionMode: 0644,
 		ChrootDirectory: "",
 		WithMetadata: false,
+		Filesystem: osfs.New(dataPath),
 	}
 
 	// init worktree
-	wt, err := fs.Repository.Worktree()
+	/* wt, err := fs.Repository.Worktree()
 	if err != nil {
 		fs.Error = err;
 		// return broken fs, error will be catched in chained function
 		return fs
-	}
+	} */
 
-	fs.Worktree = wt
-	fs.Filesystem = wt.Filesystem
+	//fs.Worktree = wt
+	//fs.Filesystem = wt.Filesystem
 
 	// run options
 	for _, option := range options {
@@ -159,7 +190,7 @@ func (fs *filesystem) Save(path string, file File) error {
 }
 
 func (fs *filesystem) Commit(path string, file File, commit Commit) error {
-	// check for error
+	/*// check for error
 	if fs.Error != nil {
 		return fs.Error
 	}
@@ -176,7 +207,7 @@ func (fs *filesystem) Commit(path string, file File, commit Commit) error {
 		}
 
 		return commitFile(fs, path + ".meta", metadata, commit)
-	}
+	}*/
 
 	return nil
 }
