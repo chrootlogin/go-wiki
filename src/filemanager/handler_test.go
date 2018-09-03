@@ -1,8 +1,10 @@
 package filemanager
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,8 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chrootlogin/go-wiki/src/lib/common"
-	"bytes"
-	"mime/multipart"
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 )
 
