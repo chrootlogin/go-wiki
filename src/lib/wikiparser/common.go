@@ -3,6 +3,7 @@ package wikiparser
 import (
 	"bufio"
 	"bytes"
+	"errors"
 )
 
 const (
@@ -120,7 +121,7 @@ func parseExpression(expr []byte) (*Expression, error) {
 
 	for {
 		r, _, err := buf.ReadRune()
-		// stop on error
+		// stop on end
 		if err != nil {
 			break
 		}
@@ -130,7 +131,10 @@ func parseExpression(expr []byte) (*Expression, error) {
 		}
 
 		if r == ARGS_START {
-			args = parseArgs(buf)
+			args, err = parseArgs(buf)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -140,7 +144,7 @@ func parseExpression(expr []byte) (*Expression, error) {
 	}, nil
 }
 
-func parseArgs(buf *bytes.Buffer) []string {
+func parseArgs(buf *bytes.Buffer) ([]string, error) {
 	args := make([]string, 1)
 
 	i := 0
@@ -152,7 +156,7 @@ func parseArgs(buf *bytes.Buffer) []string {
 		}
 
 		if r == ARGS_STOP {
-			break
+			return args, nil
 		}
 
 		if r == ARGS_DELIMITER {
@@ -164,7 +168,7 @@ func parseArgs(buf *bytes.Buffer) []string {
 		args[i] += string(r)
 	}
 
-	return args
+	return nil, errors.New("parsing error")
 }
 
 

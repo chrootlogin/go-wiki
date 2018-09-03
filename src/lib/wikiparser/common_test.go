@@ -18,24 +18,48 @@ func TestWikiparser_Parse(t *testing.T) {
 
 	type testCase struct {
 		Data []byte
-		Expected Expression
+		Expected []Expression
 	}
 
 	testCases := []testCase{
 		{
+			Data: []byte("{"),
+			Expected: []Expression{},
+		},
+		{
+			Data: []byte("{blaa"),
+			Expected: []Expression{},
+		},
+		{
+			Data: []byte("{{ blaa"),
+			Expected: []Expression{},
+		},
+		{
+			Data: []byte("{{ blaa( }}"),
+			Expected: []Expression{},
+		},
+		{
+			Data: []byte("{{ blaa(sdgjkw, }}"),
+			Expected: []Expression{},
+		},
+		{
 			Data: []byte("{{ test }}"),
-			Expected: Expression{
-				Action: "test",
-				Args:   nil,
+			Expected: []Expression{
+				{
+					Action: "test",
+					Args:   nil,
+				},
 			},
 		},
 		{
 			Data: []byte("{{ test(test,1234) }}"),
-			Expected: Expression{
-				Action: "test",
-				Args: []string{
-					"test",
-					"1234",
+			Expected: []Expression{
+				{
+					Action: "test",
+					Args: []string{
+						"test",
+						"1234",
+					},
 				},
 			},
 		},
@@ -45,8 +69,11 @@ func TestWikiparser_Parse(t *testing.T) {
 		wp := New(tc.Data)
 
 		wp.Parse()
-		assert.True(len(wp.Expressions) == 1)
-		assert.Equal(tc.Expected.Action, wp.Expressions[0].Action)
-		assert.Equal(tc.Expected.Args, wp.Expressions[0].Args)
+
+		assert.True(len(tc.Expected) == len(wp.Expressions))
+		for i, _ := range tc.Expected {
+			assert.Equal(tc.Expected[i].Action, wp.Expressions[i].Action)
+			assert.Equal(tc.Expected[i].Args, wp.Expressions[i].Args)
+		}
 	}
 }
