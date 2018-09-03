@@ -25,6 +25,15 @@ func TestUserList_Get(t *testing.T) {
 	}
 }
 
+func TestUserList_Get2(t *testing.T) {
+	assert := assert.New(t)
+
+	_, err := UserList().Get("no-exist")
+	if assert.Error(err) {
+		assert.Equal(ErrUserNotExist, err)
+	}
+}
+
 func TestUserList_Add(t *testing.T) {
 	assert := assert.New(t)
 
