@@ -13,6 +13,10 @@ import (
 
 const USERS_CACHE = "users"
 
+var (
+	ErrUserNotExist = errors.New("user does not exist")
+)
+
 type userList struct {
 	Users map[string]common.User
 	Error error
@@ -29,7 +33,7 @@ func (ul *userList) Get(username string) (common.User, error) {
 		value.Username = username
 		return value, nil
 	} else {
-		return common.User{}, errors.New("User not found: " + username)
+		return common.User{}, ErrUserNotExist
 	}
 }
 
