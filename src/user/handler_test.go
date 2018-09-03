@@ -54,6 +54,7 @@ func TestRegisterHandler(t *testing.T) {
 			},
 			expectedCode: http.StatusCreated,
 		},
+		// already exists
 		{
 			apiReq: apiRequest{
 				Username: "testuser1",
@@ -62,6 +63,7 @@ func TestRegisterHandler(t *testing.T) {
 			},
 			expectedCode: http.StatusBadRequest,
 		},
+		// strange username
 		{
 			apiReq: apiRequest{
 				Username: "test*ç%user2",
@@ -70,11 +72,39 @@ func TestRegisterHandler(t *testing.T) {
 			},
 			expectedCode: http.StatusBadRequest,
 		},
+		// wrong email
 		{
 			apiReq: apiRequest{
 				Username: "testuser2",
 				Password: "admin12345",
 				Email:    "test@exam@*ple.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		// too short username
+		{
+			apiReq: apiRequest{
+				Username: "te",
+				Password: "admin12345",
+				Email:    "test@example.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		// too long username
+		{
+			apiReq: apiRequest{
+				Username: "teodksjdfhfwkkshdffhwuiefnkjaksdfsdfasdsdfkjewkeqjke",
+				Password: "admin12345",
+				Email:    "test@example.org",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		// too short password
+		{
+			apiReq: apiRequest{
+				Username: "testuser3",
+				Password: "ad",
+				Email:    "test@example.org",
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -102,5 +132,41 @@ func TestRegisterHandler(t *testing.T) {
 				assert.Equal(test.expectedCode, w.Code)
 			}
 		}
+	}
+}
+
+func TestRegisterHandler2(t *testing.T) {
+	assert := assert.New(t)
+
+	// enable registration
+	err := store.Config().Set("registration", "1")
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.POST("/user/register", RegisterHandler)
+
+		req, _ := http.NewRequest("POST", "/user/register", bytes.NewReader([]byte{}))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusBadRequest, w.Code)
+	}
+}
+
+func TestRegisterHandler3(t *testing.T) {
+	assert := assert.New(t)
+
+	// enable registration
+	err := store.Config().Set("registration", "0")
+	if assert.NoError(err) {
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.POST("/user/register", RegisterHandler)
+
+		req, _ := http.NewRequest("POST", "/user/register", bytes.NewReader([]byte{}))
+		r.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusForbidden, w.Code)
 	}
 }
