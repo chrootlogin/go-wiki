@@ -15,6 +15,7 @@ import (
 	"github.com/chrootlogin/go-wiki/src/lib/filesystem"
 	"github.com/chrootlogin/go-wiki/src/lib/helper"
 	"github.com/chrootlogin/go-wiki/src/lib/pagestore"
+	"github.com/chrootlogin/go-wiki/src/lib/wikiparser"
 )
 
 var (
@@ -210,6 +211,8 @@ func renderPage(html string) string {
 
 	// Sanitize HTML
 	output = bluemonday.UGCPolicy().SanitizeBytes(output)
+
+	wikiparser.New(output).Parse()
 
 	return string(output)
 }
