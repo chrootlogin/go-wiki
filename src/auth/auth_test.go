@@ -166,3 +166,25 @@ func TestAuthMiddleware_MiddlewareFunc2(t *testing.T) {
 		}
 	}
 }
+
+func TestAuthMiddleware_MiddlewareFunc3(t *testing.T) {
+	assert := assert.New(t)
+
+	os.Setenv("SESSION_KEY", "not-a-secret-key")
+	am := GetAuthMiddleware()
+
+	w := httptest.NewRecorder()
+	r := gin.Default()
+
+	api := r.Group("/api/")
+	api.Use(am.MiddlewareFunc())
+	{
+		api.GET("/page/*path", page.PostPageHandler)
+	}
+
+	req, _ := http.NewRequest("GET", "/api/page/index.md", nil)
+	req.Header.Add("Authorization", "Bearer vkldklWEfweklergkl3KSDFJJWHEGKLSDFKSKDFJAHWEH")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(http.StatusUnauthorized, w.Code)
+}
