@@ -32,9 +32,9 @@ func (ul *userList) Get(username string) (common.User, error) {
 	if ok {
 		value.Username = username
 		return value, nil
-	} else {
-		return common.User{}, ErrUserNotExist
 	}
+
+	return common.User{}, ErrUserNotExist
 }
 
 func (ul *userList) Add(user common.User) error {
@@ -44,20 +44,23 @@ func (ul *userList) Add(user common.User) error {
 	}
 
 	ul.Users[user.Username] = user
-
-	jsonData, err := json.Marshal(ul.Users)
+	err := ul.save()
 	if err != nil {
 		return err
 	}
 
-	err = filesystem.New(filesystem.WithChroot("prefs")).Save("_users.json", filesystem.File{Content: string(jsonData)})
-	if err != nil {
-		return err
-	}
-
-	// remove users from cache
-	storeCache.Set(USERS_CACHE, ul.Users, cache.NoExpiration)
+	// write new users to cache
+	storeCache.Set(USERS_CACHE, ul.Users, cache.DefaultExpiration)
 	return nil
+}
+
+func (ul *userList) Delete(user common.User) {
+	_, ok := ul.Users[user.Username]
+	if ok {
+		delete(ul.Users, user.Username)
+
+		storeCache.Set(USERS_CACHE, ul.Users, cache.DefaultExpiration)
+	}
 }
 
 func UserList() *userList {
@@ -89,9 +92,41 @@ func UserList() *userList {
 	}
 
 	// add to cache with no expiration
-	storeCache.Set(USERS_CACHE, users, cache.NoExpiration)
+	storeCache.Set(USERS_CACHE, users, cache.DefaultExpiration)
 
 	return &userList{
 		Users: users,
 	}
+}
+
+func (ul *userList) save() error {
+	jsonData, err := json.Marshal(ul.Users)
+	if err != nil {
+		return err
+	}
+
+	err = filesystem.New(filesystem.WithChroot("prefs")).Save("_users.json", filesystem.File{Content: string(jsonData)})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ul *userList) refresh() error {
+	// read from disk
+	usersRaw, err := filesystem.New(filesystem.WithChroot("prefs")).Get("_users.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Convert json to object
+	var users map[string]common.User
+	err = json.Unmarshal([]byte(usersRaw.Content), &users)
+	if err != nil {
+		return err
+	}
+
+	ul.Users = users
+	return nil
 }
